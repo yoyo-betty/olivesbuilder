@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olives — Journey Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e1017;
+  --surface:#161921;
+  --surface2:#1c2030;
+  --surface3:#222638;
+  --border:#252a3a;
+  --border2:#2e3448;
+  --border3:#3a4060;
+  --text:#e2e6f0;
+  --text2:#8892aa;
+  --text3:#4a5270;
+  --accent:#4ade80;
+  --accent2:#22c55e;
+  --red:#f87171;
+  --amber:#f59e0b;
+  --blue:#60a5fa;
+  --purple:#a78bfa;
+}
+
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.026) 1px,transparent 0);
+  background-size:28px 28px;pointer-events:none;z-index:0;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;height:54px;
+  background:rgba(22,25,33,0.95);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 32px;
+  z-index:200;gap:0;
+}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-mark{
+  width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;color:#fff;
+  box-shadow:0 0 14px rgba(34,197,94,0.28);
+}
+.logo-text{font-size:15px;font-weight:700;color:var(--text)}
+.logo-version{
+  font-size:9px;font-family:'IBM Plex Mono',monospace;
+  color:var(--text3);background:var(--surface2);
+  border:1px solid var(--border);
+  padding:2px 7px;border-radius:20px;margin-left:6px;
+}
+.vsep{width:1px;height:26px;background:var(--border);margin:0 20px}
+
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-link{
+  padding:6px 14px;border-radius:7px;font-size:13px;font-weight:500;
+  color:var(--text2);cursor:pointer;transition:all 0.15s;border:none;background:transparent;
+  font-family:'Outfit',sans-serif;
+}
+.nav-link:hover{color:var(--text);background:var(--surface2)}
+.nav-link.active{color:var(--text);background:var(--surface2)}
+
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+.btn{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 18px;border-radius:8px;
+  font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;
+  cursor:pointer;border:1px solid transparent;
+  transition:all 0.18s;white-space:nowrap;
+}
+.btn-ghost{background:transparent;border-color:var(--border2);color:var(--text2)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);border-color:var(--border3)}
+.btn-index{background:rgba(219,112,147,0.12);border-color:rgba(219,112,147,0.35);color:#d4748f;text-decoration:none;padding:4px 11px;font-size:11px;border-radius:6px}
+.btn-index:hover{background:rgba(219,112,147,0.2);border-color:rgba(219,112,147,0.55);color:#e08da5}
+
+  background:var(--accent2);border-color:var(--accent2);color:#fff;font-weight:700;
+  box-shadow:0 0 18px rgba(34,197,94,0.2);
+}
+.btn-primary:hover{background:#16a34a;box-shadow:0 0 26px rgba(34,197,94,0.35)}
+
+/* ── PAGE BODY ── */
+.page{max-width:1200px;margin:0 auto;padding:40px 32px 80px;position:relative;z-index:1}
+
+/* ── PAGE HEADER ── */
+.page-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:40px;gap:24px;
+}
+.page-header-left{}
+.page-eyebrow{
+  font-size:10px;font-weight:700;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.page-eyebrow::before{content:'';width:18px;height:2px;background:var(--accent);border-radius:1px}
+.page-title{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-0.025em;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--text2);line-height:1.5}
+
+.header-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;padding-top:6px}
+
+/* ── STATS ROW ── */
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px;margin-bottom:36px;
+}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:18px 20px;
+  transition:border-color 0.2s;
+}
+.stat-card:hover{border-color:var(--border2)}
+.stat-label{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.stat-value{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:4px}
+.stat-sub{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px}
+.stat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* ── SEARCH / FILTER BAR ── */
+.toolbar{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;flex-wrap:wrap;
+}
+.search-wrap{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:9px;padding:9px 14px;flex:1;min-width:220px;
+  max-width:340px;transition:border-color 0.18s;
+}
+.search-wrap:focus-within{border-color:var(--border3)}
+.search-wrap input{
+  background:transparent;border:none;outline:none;
+  font-size:13px;font-family:'Outfit',sans-serif;
+  color:var(--text);width:100%;
+}
+.search-wrap input::placeholder{color:var(--text3)}
+.search-icon{font-size:13px;color:var(--text3)}
+
+.filter-pills{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.filter-pill{
+  padding:7px 14px;border-radius:7px;border:1px solid var(--border);
+  background:var(--surface);font-size:12px;font-weight:500;
+  color:var(--text2);cursor:pointer;transition:all 0.15s;
+  font-family:'Outfit',sans-serif;
+}
+.filter-pill:hover{border-color:var(--border2);color:var(--text)}
+.filter-pill.active{
+  border-color:var(--border3);background:var(--surface2);
+  color:var(--text);
+}
+
+.toolbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.sort-select{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;
+  font-size:12px;font-family:'Outfit',sans-serif;
+  color:var(--text2);outline:none;cursor:pointer;
+  appearance:none;padding-right:28px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%234a5270' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+}
+
+/* ── SECTION GROUPS ── */
+.journey-section{margin-bottom:40px}
+.section-header{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:14px;padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.section-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px}
+.section-badge{
+  font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace;
+  padding:2px 8px;border-radius:20px;
+}
+.badge-active{background:rgba(74,222,128,0.12);color:var(--accent);border:1px solid rgba(74,222,128,0.2)}
+.badge-design{background:rgba(96,165,250,0.1);color:var(--blue);border:1px solid rgba(96,165,250,0.18)}
+.badge-done{background:rgba(74,85,104,0.3);color:var(--text3);border:1px solid var(--border2)}
+.section-line{flex:1;height:1px;background:var(--border)}
+
+/* ── JOURNEY TABLE ── */
+.journey-table{width:100%;border-collapse:collapse}
+.journey-table th{
+  font-size:10px;font-weight:700;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--text3);
+  padding:0 16px 10px;text-align:left;
+}
+.journey-table th:last-child{text-align:right}
+
+.journey-row{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  transition:all 0.16s;
+  cursor:default;
+}
+.journey-row:hover{border-color:var(--border2);background:var(--surface2)}
+.journey-row td{padding:0}
+
+/* spacer between rows */
+.journey-row-spacer td{height:6px;background:transparent;border:none}
+
+.row-cell{
+  padding:15px 16px;
+  display:flex;align-items:center;
+  height:64px;
+}
+
+/* first/last cell rounding */
+.journey-row td:first-child .row-cell{border-radius:10px 0 0 10px}
+.journey-row td:last-child .row-cell{border-radius:0 10px 10px 0}
+
+/* ── JOURNEY NAME CELL ── */
+.journey-name-cell{display:flex;align-items:center;gap:12px}
+.journey-type-icon{
+  width:36px;height:36px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.journey-info{}
+.journey-name{
+  font-size:14px;font-weight:600;color:var(--text);
+  cursor:pointer;transition:color 0.15s;
+  text-decoration:none;display:inline;
+}
+.journey-name:hover{color:var(--accent)}
+.journey-meta{font-size:11px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:8px}
+.journey-cat{
+  font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;
+  background:var(--surface3);color:var(--text3);letter-spacing:0.04em;text-transform:uppercase;
+}
+
+/* ── STATUS BADGE ── */
+.status-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:600;
+  padding:5px 11px;border-radius:6px;
+  font-family:'IBM Plex Mono',monospace;
+  white-space:nowrap;
+}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.s-live{background:rgba(74,222,128,0.1);color:var(--accent);border:1px solid rgba(74,222,128,0.2)}
+.s-live .status-dot{background:var(--accent);box-shadow:0 0 6px rgba(74,222,128,0.6);animation:blink 2s infinite}
+.s-paused{background:rgba(245,158,11,0.08);color:var(--amber);border:1px solid rgba(245,158,11,0.18)}
+.s-paused .status-dot{background:var(--amber)}
+.s-design{background:rgba(96,165,250,0.08);color:var(--blue);border:1px solid rgba(96,165,250,0.18)}
+.s-design .status-dot{background:var(--blue)}
+.s-draft{background:rgba(74,85,104,0.2);color:var(--text3);border:1px solid var(--border2)}
+.s-draft .status-dot{background:var(--text3)}
+.s-done{background:rgba(167,139,250,0.08);color:var(--purple);border:1px solid rgba(167,139,250,0.15)}
+.s-done .status-dot{background:var(--purple)}
+.s-blocked{background:rgba(248,113,113,0.08);color:var(--red);border:1px solid rgba(248,113,113,0.15)}
+.s-blocked .status-dot{background:var(--red)}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* ── STATS CELLS ── */
+.stat-cell{
+  font-size:13px;font-weight:600;color:var(--text);
+  font-family:'IBM Plex Mono',monospace;
+}
+.stat-cell .sub{font-size:10px;font-weight:500;color:var(--text3);display:block;margin-top:1px;font-family:'Outfit',sans-serif}
+
+/* ── MINI SPARKLINE ── */
+.sparkline{display:flex;align-items:flex-end;gap:2px;height:24px}
+.spark-bar{width:4px;border-radius:2px;background:var(--border2);transition:background 0.2s}
+.journey-row:hover .spark-bar{background:var(--border3)}
+
+/* ── 3-DOT MENU ── */
+.dot-menu-wrap{position:relative}
+.dot-btn{
+  width:32px;height:32px;border-radius:7px;
+  background:transparent;border:1px solid transparent;
+  color:var(--text3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:all 0.15s;letter-spacing:1px;
+  font-family:'Outfit',sans-serif;
+}
+.dot-btn:hover{background:var(--surface3);border-color:var(--border2);color:var(--text2)}
+.dot-btn.open{background:var(--surface3);border-color:var(--border2);color:var(--text)}
+
+.dot-menu{
+  position:absolute;right:0;top:calc(100% + 6px);
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:10px;padding:5px;
+  min-width:180px;z-index:300;
+  box-shadow:0 12px 40px rgba(0,0,0,0.6);
+  display:none;
+}
+.dot-menu.open{display:block;animation:menuIn 0.12s ease}
+@keyframes menuIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+.dot-menu-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:7px;
+  font-size:12px;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:all 0.12s;
+  border:none;background:transparent;width:100%;
+  font-family:'Outfit',sans-serif;text-align:left;
+}
+.dot-menu-item:hover{background:var(--surface2);color:var(--text)}
+.dot-menu-item .mi-icon{width:20px;text-align:center;font-size:13px;flex-shrink:0}
+.dot-menu-item.danger{color:var(--red)}
+.dot-menu-item.danger:hover{background:rgba(248,113,113,0.08);color:var(--red)}
+.dot-menu-sep{height:1px;background:var(--border);margin:4px 0}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  text-align:center;padding:52px 24px;
+  background:var(--surface);border:1px dashed var(--border2);
+  border-radius:12px;margin-bottom:6px;
+}
+.empty-icon{font-size:32px;margin-bottom:12px}
+.empty-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--text3);line-height:1.6}
+
+/* ── TEMPLATE MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.72);
+  backdrop-filter:blur(6px);z-index:500;
+  display:none;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;animation:overlayIn 0.2s ease}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+
+.modal{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:16px;width:720px;max-width:95vw;max-height:85vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 32px 80px rgba(0,0,0,0.7);
+  animation:modalIn 0.22s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 26px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.modal-title{font-size:17px;font-weight:700;color:var(--text)}
+.modal-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.modal-close{
+  width:32px;height:32px;border-radius:7px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text3);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;
+}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+
+.modal-body{padding:24px 26px;overflow-y:auto;flex:1}
+.modal-body::-webkit-scrollbar{width:4px}
+.modal-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.template-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.template-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:11px;padding:18px;cursor:pointer;
+  transition:all 0.18s;
+}
+.template-card:hover{border-color:var(--accent);background:rgba(74,222,128,0.04);transform:translateY(-1px)}
+.tc-icon{font-size:24px;margin-bottom:10px}
+.tc-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.tc-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:10px}
+.tc-tags{display:flex;gap:5px;flex-wrap:wrap}
+.tc-tag{
+  font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;
+  background:var(--surface3);color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.04em;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .template-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark">🫒</div>
+    <div class="logo-text">Olives Builder</div>
+    <a href="olives-feature-index-v3.html" target="_blank" class="btn btn-index">Feature Index</a>
+    <span class="logo-version">v2.1</span>
+  </div>
+  <div class="vsep"></div>
+  <nav class="nav-links">
+    <button class="nav-link active">Journeys</button>
+    <button class="nav-link">Analytics</button>
+    <button class="nav-link">Players</button>
+    <button class="nav-link">Settings</button>
+  </nav>
+  <div class="topbar-right">
+    <button class="btn btn-ghost" onclick="openTemplates()">📋 From Template</button>
+    <button class="btn btn-primary" onclick="createNew()">+ Create New</button>
+  </div>
+</header>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-eyebrow">Journey Manager</div>
+      <div class="page-title">Campaigns</div>
+      <div class="page-sub">Build, monitor and manage all player journey campaigns from one place.</div>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Active Campaigns</div>
+      <div class="stat-value">8</div>
+      <div class="stat-sub"><div class="stat-dot" style="background:var(--accent)"></div> 3 going live today</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Players in Journey</div>
+      <div class="stat-value">24,391</div>
+      <div class="stat-sub"><div class="stat-dot" style="background:var(--blue)"></div> +1,204 this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed (30d)</div>
+      <div class="stat-value">12</div>
+      <div class="stat-sub"><div class="stat-dot" style="background:var(--purple)"></div> 6 archived</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg. Conversion Rate</div>
+      <div class="stat-value">34.7%</div>
+      <div class="stat-sub"><div class="stat-dot" style="background:var(--amber)"></div> +2.1% vs last month</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search campaigns…" oninput="filterJourneys(this.value)" id="searchInput" />
+    </div>
+    <div class="filter-pills">
+      <button class="filter-pill active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-pill" onclick="setFilter('active',this)">Active</button>
+      <button class="filter-pill" onclick="setFilter('design',this)">In Design</button>
+      <button class="filter-pill" onclick="setFilter('completed',this)">Completed</button>
+    </div>
+    <div class="toolbar-right">
+      <select class="sort-select" onchange="sortJourneys(this.value)">
+        <option value="updated">Last updated</option>
+        <option value="name">Name A–Z</option>
+        <option value="players">Most players</option>
+        <option value="created">Date created</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ══ SECTION: ACTIVE ══ -->
+  <div class="journey-section" id="section-active">
+    <div class="section-header">
+      <div class="section-title">
+        🟢 Active
+        <span class="section-badge badge-active" id="count-active">5</span>
+      </div>
+      <div class="section-line"></div>
+    </div>
+    <table class="journey-table" id="table-active">
+      <thead>
+        <tr>
+          <th style="width:35%">Campaign</th>
+          <th style="width:12%">Status</th>
+          <th style="width:12%">Players</th>
+          <th style="width:10%">Completed</th>
+          <th style="width:10%">Conv. Rate</th>
+          <th style="width:11%">Last Updated</th>
+          <th style="width:10%"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody-active"></tbody>
+    </table>
+  </div>
+
+  <!-- ══ SECTION: IN DESIGN ══ -->
+  <div class="journey-section" id="section-design">
+    <div class="section-header">
+      <div class="section-title">
+        🔵 In Design
+        <span class="section-badge badge-design" id="count-design">4</span>
+      </div>
+      <div class="section-line"></div>
+    </div>
+    <table class="journey-table" id="table-design">
+      <thead>
+        <tr>
+          <th style="width:35%">Campaign</th>
+          <th style="width:12%">Status</th>
+          <th style="width:12%">Players</th>
+          <th style="width:10%">Nodes</th>
+          <th style="width:10%">Progress</th>
+          <th style="width:11%">Last Edited</th>
+          <th style="width:10%"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody-design"></tbody>
+    </table>
+  </div>
+
+  <!-- ══ SECTION: COMPLETED ══ -->
+  <div class="journey-section" id="section-completed">
+    <div class="section-header">
+      <div class="section-title">
+        ⚫ Completed
+        <span class="section-badge badge-done" id="count-completed">3</span>
+      </div>
+      <div class="section-line"></div>
+    </div>
+    <table class="journey-table" id="table-completed">
+      <thead>
+        <tr>
+          <th style="width:35%">Campaign</th>
+          <th style="width:12%">Status</th>
+          <th style="width:12%">Total Players</th>
+          <th style="width:10%">Conversions</th>
+          <th style="width:10%">Conv. Rate</th>
+          <th style="width:11%">Ended</th>
+          <th style="width:10%"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody-completed"></tbody>
+    </table>
+  </div>
+
+</div><!-- /page -->
+
+<!-- TEMPLATE MODAL -->
+<div class="modal-overlay" id="templateModal" onclick="closeTemplates(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Start from a Template</div>
+        <div class="modal-sub">Choose a pre-built journey structure to get started faster</div>
+      </div>
+      <button class="modal-close" onclick="closeTemplates()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="template-grid">
+        <div class="template-card" onclick="useTemplate('Welcome Series')">
+          <div class="tc-icon">👋</div>
+          <div class="tc-name">Welcome Series</div>
+          <div class="tc-desc">Onboard new registrants with a multi-touch welcome flow including a first-deposit bonus and guided tutorial.</div>
+          <div class="tc-tags"><span class="tc-tag">Acquisition</span><span class="tc-tag">7 nodes</span></div>
+        </div>
+        <div class="template-card" onclick="useTemplate('Churn Prevention')">
+          <div class="tc-icon">🔄</div>
+          <div class="tc-name">Churn Prevention</div>
+          <div class="tc-desc">Detect at-risk players by inactivity and trigger re-engagement sequences with personalised bonus offers.</div>
+          <div class="tc-tags"><span class="tc-tag">Retention</span><span class="tc-tag">12 nodes</span></div>
+        </div>
+        <div class="template-card" onclick="useTemplate('VIP Upgrade')">
+          <div class="tc-icon">⭐</div>
+          <div class="tc-name">VIP Upgrade Path</div>
+          <div class="tc-desc">Celebrate tier upgrades and reward players who cross VIP thresholds with exclusive bonuses and messaging.</div>
+          <div class="tc-tags"><span class="tc-tag">Retention</span><span class="tc-tag">9 nodes</span></div>
+        </div>
+        <div class="template-card" onclick="useTemplate('Tournament Push')">
+          <div class="tc-icon">🏆</div>
+          <div class="tc-name">Tournament Push</div>
+          <div class="tc-desc">Drive tournament participation with countdown reminders, rank-based messages and prize announcements.</div>
+          <div class="tc-tags"><span class="tc-tag">Conversion</span><span class="tc-tag">10 nodes</span></div>
+        </div>
+        <div class="template-card" onclick="useTemplate('Reactivation')">
+          <div class="tc-icon">💡</div>
+          <div class="tc-name">Lapsed Player Reactivation</div>
+          <div class="tc-desc">Bring back players dormant for 30+ days through a tiered incentive sequence across email, SMS and in-app.</div>
+          <div class="tc-tags"><span class="tc-tag">Reactivation</span><span class="tc-tag">14 nodes</span></div>
+        </div>
+        <div class="template-card" onclick="useTemplate('Deposit Match')">
+          <div class="tc-icon">💰</div>
+          <div class="tc-name">Deposit Match Campaign</div>
+          <div class="tc-desc">Trigger deposit match bonuses when players meet criteria, with follow-up sequences based on their response.</div>
+          <div class="tc-tags"><span class="tc-tag">Conversion</span><span class="tc-tag">8 nodes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const JOURNEYS = [
+  // ACTIVE
+  {id:1, group:'active', name:'Summer Re-engagement Q3', category:'Reactivation', type:'realtime', status:'live',
+   players:8420, completed:3102, conv:'36.8%', updated:'2 hours ago',
+   spark:[30,45,60,55,70,85,90,75,88,95]},
+  {id:2, group:'active', name:'VIP Tier Upgrade — Diamond', category:'Retention', type:'realtime', status:'live',
+   players:1203, completed:441, conv:'36.7%', updated:'5 hours ago',
+   spark:[20,25,30,28,40,52,48,60,55,70]},
+  {id:3, group:'active', name:'First Deposit Welcome Flow', category:'Acquisition', type:'schedule', status:'live',
+   players:5614, completed:2300, conv:'41.0%', updated:'1 day ago',
+   spark:[60,65,70,68,75,80,78,82,85,90]},
+  {id:4, group:'active', name:'Tournament Finals Push', category:'Conversion', type:'realtime', status:'paused',
+   players:2890, completed:870, conv:'30.1%', updated:'3 days ago',
+   spark:[80,75,70,65,60,55,50,48,45,40]},
+  {id:5, group:'active', name:'Weekend Cashback Offer', category:'Retention', type:'schedule', status:'live',
+   players:4120, completed:1654, conv:'40.1%', updated:'6 hours ago',
+   spark:[40,50,60,70,65,80,75,85,90,88]},
+
+  // IN DESIGN
+  {id:6, group:'design', name:'Lapsed 60-Day Winback', category:'Reactivation', type:'realtime', status:'design',
+   players:0, nodes:14, progress:'72%', updated:'Today, 11:42am'},
+  {id:7, group:'design', name:'Mission Completion Bonus', category:'Retention', type:'schedule', status:'draft',
+   players:0, nodes:7, progress:'40%', updated:'Yesterday'},
+  {id:8, group:'design', name:'New Game Launch Campaign', category:'Conversion', type:'realtime', status:'design',
+   players:0, nodes:11, progress:'85%', updated:'2 days ago'},
+  {id:9, group:'design', name:'Referral Reward Journey', category:'Acquisition', type:'realtime', status:'draft',
+   players:0, nodes:4, progress:'20%', updated:'4 days ago'},
+
+  // COMPLETED
+  {id:10, group:'completed', name:'Spring Tournament Series', category:'Conversion', type:'realtime', status:'done',
+   players:11240, completed:4320, conv:'38.4%', updated:'Jun 30, 2025'},
+  {id:11, group:'completed', name:'Easter Re-engagement Blast', category:'Reactivation', type:'schedule', status:'done',
+   players:6780, completed:2103, conv:'31.0%', updated:'Apr 14, 2025'},
+  {id:12, group:'completed', name:'January VIP Kickoff', category:'Retention', type:'realtime', status:'done',
+   players:3410, completed:1560, conv:'45.7%', updated:'Jan 31, 2025'},
+];
+
+let activeFilter = 'all';
+let searchQuery = '';
+
+// ── CATEGORY COLOURS ──
+const catColors = {
+  Acquisition:'rgba(74,222,128,0.1)', Conversion:'rgba(96,165,250,0.1)',
+  Retention:'rgba(167,139,250,0.1)',  Reactivation:'rgba(245,158,11,0.08)',
+  General:'rgba(74,85,104,0.2)'
+};
+const catText = {
+  Acquisition:'var(--accent)', Conversion:'var(--blue)',
+  Retention:'var(--purple)',   Reactivation:'var(--amber)',
+  General:'var(--text3)'
+};
+const typeIcon = {realtime:'⚡', schedule:'📅'};
+
+// ── STATUS BADGES ──
+function statusBadge(s) {
+  const map = {
+    live:    ['s-live',    '●', 'Live'],
+    paused:  ['s-paused',  '●', 'Paused'],
+    design:  ['s-design',  '●', 'In Design'],
+    draft:   ['s-draft',   '●', 'Draft'],
+    done:    ['s-done',    '●', 'Completed'],
+    blocked: ['s-blocked', '●', 'Blocked'],
+  };
+  const [cls, dot, label] = map[s] || ['s-draft','●','Unknown'];
+  return `<span class="status-badge ${cls}"><span class="status-dot"></span>${label}</span>`;
+}
+
+// ── SPARKLINE ──
+function sparkline(data) {
+  if (!data) return '';
+  const max = Math.max(...data);
+  return `<div class="sparkline">${data.map(v => {
+    const h = Math.max(3, Math.round((v/max)*24));
+    const opacity = 0.3 + (v/max)*0.7;
+    return `<div class="spark-bar" style="height:${h}px;opacity:${opacity}"></div>`;
+  }).join('')}</div>`;
+}
+
+// ── 3-DOT MENU HTML ──
+function dotMenu(j) {
+  const isLive   = j.status === 'live';
+  const isPaused = j.status === 'paused';
+  const isDone   = j.status === 'done';
+  const isDesign = j.status === 'design' || j.status === 'draft';
+
+  let items = `
+    <button class="dot-menu-item" onclick="goToCanvas(${j.id})">
+      <span class="mi-icon">🖊</span> Open in Canvas
+    </button>`;
+
+  if (isDesign) items += `
+    <button class="dot-menu-item" onclick="activateJourney(${j.id})">
+      <span class="mi-icon">▶</span> Activate
+    </button>`;
+
+  if (isLive) items += `
+    <button class="dot-menu-item" onclick="pauseJourney(${j.id})">
+      <span class="mi-icon">⏸</span> Pause
+    </button>`;
+
+  if (isPaused) items += `
+    <button class="dot-menu-item" onclick="resumeJourney(${j.id})">
+      <span class="mi-icon">▶</span> Resume
+    </button>`;
+
+  if (!isDone) items += `
+    <button class="dot-menu-item" onclick="completeJourney(${j.id})">
+      <span class="mi-icon">✓</span> Mark Complete
+    </button>`;
+
+  items += `
+    <button class="dot-menu-item" onclick="duplicateJourney(${j.id})">
+      <span class="mi-icon">⧉</span> Duplicate
+    </button>`;
+
+  if (!isDesign && !isDone) items += `
+    <button class="dot-menu-item" onclick="blockJourney(${j.id})">
+      <span class="mi-icon">🚫</span> Block
+    </button>`;
+
+  items += `<div class="dot-menu-sep"></div>
+    <button class="dot-menu-item danger" onclick="deleteJourney(${j.id})">
+      <span class="mi-icon">🗑</span> Delete
+    </button>`;
+
+  return `<div class="dot-menu-wrap">
+    <button class="dot-btn" onclick="toggleMenu(event,${j.id})" id="dotbtn-${j.id}">•••</button>
+    <div class="dot-menu" id="menu-${j.id}">${items}</div>
+  </div>`;
+}
+
+// ── RENDER ROW (active/completed) ──
+function renderActiveRow(j) {
+  const icon = typeIcon[j.type] || '⚡';
+  return `
+  <tr class="journey-row" id="row-${j.id}">
+    <td><div class="row-cell">
+      <div class="journey-name-cell">
+        <div class="journey-type-icon" style="background:${catColors[j.category]}">
+          <span style="color:${catText[j.category]}">${icon}</span>
+        </div>
+        <div class="journey-info">
+          <span class="journey-name" onclick="goToCanvas(${j.id})">${j.name}</span>
+          <div class="journey-meta">
+            <span class="journey-cat" style="background:${catColors[j.category]};color:${catText[j.category]}">${j.category}</span>
+          </div>
+        </div>
+      </div>
+    </div></td>
+    <td><div class="row-cell">${statusBadge(j.status)}</div></td>
+    <td><div class="row-cell">
+      <div class="stat-cell">
+        ${j.players.toLocaleString()}
+        <span class="sub">in journey</span>
+      </div>
+    </div></td>
+    <td><div class="row-cell">
+      <div class="stat-cell">
+        ${j.completed.toLocaleString()}
+        <span class="sub">finished</span>
+      </div>
+    </div></td>
+    <td><div class="row-cell">
+      <div class="stat-cell" style="color:var(--accent)">${j.conv}</div>
+    </div></td>
+    <td><div class="row-cell">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:11px;color:var(--text3)">${j.updated}</div>
+        ${sparkline(j.spark)}
+      </div>
+    </div></td>
+    <td><div class="row-cell" style="justify-content:flex-end">${dotMenu(j)}</div></td>
+  </tr>
+  <tr class="journey-row-spacer"><td colspan="7"></td></tr>`;
+}
+
+function renderDesignRow(j) {
+  const icon = typeIcon[j.type] || '⚡';
+  const pct = parseInt(j.progress);
+  return `
+  <tr class="journey-row" id="row-${j.id}">
+    <td><div class="row-cell">
+      <div class="journey-name-cell">
+        <div class="journey-type-icon" style="background:${catColors[j.category]}">
+          <span style="color:${catText[j.category]}">${icon}</span>
+        </div>
+        <div class="journey-info">
+          <span class="journey-name" onclick="goToCanvas(${j.id})">${j.name}</span>
+          <div class="journey-meta">
+            <span class="journey-cat" style="background:${catColors[j.category]};color:${catText[j.category]}">${j.category}</span>
+          </div>
+        </div>
+      </div>
+    </div></td>
+    <td><div class="row-cell">${statusBadge(j.status)}</div></td>
+    <td><div class="row-cell"><div class="stat-cell" style="color:var(--text3)">—<span class="sub">not live yet</span></div></div></td>
+    <td><div class="row-cell"><div class="stat-cell">${j.nodes}<span class="sub">nodes built</span></div></div></td>
+    <td><div class="row-cell">
+      <div style="display:flex;flex-direction:column;gap:5px;width:80px">
+        <div style="font-size:11px;color:var(--text2);font-weight:600">${j.progress}</div>
+        <div style="height:4px;background:var(--border2);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--blue),var(--accent));border-radius:2px"></div>
+        </div>
+      </div>
+    </div></td>
+    <td><div class="row-cell"><div style="font-size:11px;color:var(--text3)">${j.updated}</div></div></td>
+    <td><div class="row-cell" style="justify-content:flex-end">${dotMenu(j)}</div></td>
+  </tr>
+  <tr class="journey-row-spacer"><td colspan="7"></td></tr>`;
+}
+
+function renderCompletedRow(j) {
+  return renderActiveRow(j); // same structure
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  const q = searchQuery.toLowerCase();
+  const f = activeFilter;
+
+  const groups = {active:[], design:[], completed:[]};
+  JOURNEYS.forEach(j => {
+    if (q && !j.name.toLowerCase().includes(q)) return;
+    if (f !== 'all' && j.group !== f) return;
+    groups[j.group].push(j);
+  });
+
+  ['active','design','completed'].forEach(g => {
+    const tbody = document.getElementById('tbody-' + g);
+    const section = document.getElementById('section-' + g);
+    const countEl = document.getElementById('count-' + g);
+    const list = groups[g];
+
+    section.style.display = (f === 'all' || f === g) ? '' : 'none';
+    countEl.textContent = list.length;
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7">
+        <div class="empty-state">
+          <div class="empty-icon">${g==='active'?'📭':g==='design'?'✏️':'📦'}</div>
+          <div class="empty-title">No ${g==='active'?'active':g==='design'?'in-design':'completed'} campaigns</div>
+          <div class="empty-sub">${g==='design'?'Start building a new journey using the button above.':'No campaigns in this state yet.'}</div>
+        </div>
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(j =>
+      g === 'design' ? renderDesignRow(j) : renderActiveRow(j)
+    ).join('');
+  });
+}
+
+// ── FILTERS ──
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+function filterJourneys(q) {
+  searchQuery = q;
+  renderAll();
+}
+
+function sortJourneys(by) {
+  if (by === 'name') JOURNEYS.sort((a,b) => a.name.localeCompare(b.name));
+  else if (by === 'players') JOURNEYS.sort((a,b) => (b.players||0) - (a.players||0));
+  renderAll();
+}
+
+// ── 3-DOT MENU ──
+let openMenuId = null;
+
+function toggleMenu(e, id) {
+  e.stopPropagation();
+  const menu = document.getElementById('menu-' + id);
+  const btn  = document.getElementById('dotbtn-' + id);
+  if (openMenuId && openMenuId !== id) closeAllMenus();
+  const isOpen = menu.classList.contains('open');
+  closeAllMenus();
+  if (!isOpen) {
+    menu.classList.add('open');
+    btn.classList.add('open');
+    openMenuId = id;
+  }
+}
+
+function closeAllMenus() {
+  document.querySelectorAll('.dot-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.dot-btn').forEach(b => b.classList.remove('open'));
+  openMenuId = null;
+}
+document.addEventListener('click', closeAllMenus);
+
+// ── ACTIONS ──
+function goToCanvas(id) {
+  closeAllMenus();
+  const j = JOURNEYS.find(x => x.id === id);
+  if (!j) return;
+  // Templates open with demo data; regular journeys open empty canvas
+  const isTemplate = j.fromTemplate;
+  window.location.href = 'olives-builder-v11.html' + (isTemplate ? '?demo=1' : '') + '#campaign-' + id;
+}
+
+function activateJourney(id) {
+  closeAllMenus();
+  const j = JOURNEYS.find(x => x.id === id);
+  if (!j) return;
+  if (confirm(`Activate "${j.name}"?\nThis will move it to Active and start accepting players.`)) {
+    j.group = 'active'; j.status = 'live'; j.players = 0; j.completed = 0; j.conv = '—';
+    j.updated = 'Just now'; j.spark = [10,10,10,10,10,10,10,10,10,10];
+    renderAll(); toast('✓ Campaign activated and now live');
+  }
+}
+
+function pauseJourney(id) {
+  closeAllMenus();
+  const j = JOURNEYS.find(x => x.id === id);
+  if (j) { j.status = 'paused'; j.updated = 'Just now'; renderAll(); toast('⏸ Campaign paused'); }
+}
+
+function resumeJourney(id) {
+  closeAllMenus();
+  const j = JOURNEYS.find(x => x.id === id);
+  if (j) { j.status = 'live'; j.updated = 'Just now'; renderAll(); toast('▶ Campaign resumed'); }
+}
+
+function completeJourney(id) {
+  closeAllMenus();
+  const j = JOURNEYS.find(x => x.id === id);
+  if (!j) return;
+  if (confirm(`Mark "${j.name}" as completed? It will move to the Completed section.`)) {
+    j.group = 'completed'; j.status = 'done'; j.updated = new Date().toLocaleDateString();
+    renderAll(); toast('✓ Campaign marked complete');
+  }
+}
+
+function blockJourney(id) {
+  closeAllMenus();
+  const j = JOURNEYS.find(x => x.id === id);
+  if (!j) return;
+  if (confirm(`Block "${j.name}"?\nThis will immediately stop all player entries and pause the journey.`)) {
+    j.status = 'blocked'; j.updated = 'Just now'; renderAll(); toast('🚫 Campaign blocked');
+  }
+}
+
+function duplicateJourney(id) {
+  closeAllMenus();
+  const j = JOURNEYS.find(x => x.id === id);
+  if (!j) return;
+  const copy = {...j, id: Date.now(), name: j.name + ' (Copy)', status:'draft', group:'design', players:0, nodes: j.nodes||8, progress:'10%', updated:'Just now'};
+  JOURNEYS.push(copy);
+  renderAll(); toast('⧉ Campaign duplicated — find it in In Design');
+}
+
+function deleteJourney(id) {
+  closeAllMenus();
+  const j = JOURNEYS.find(x => x.id === id);
+  if (!j) return;
+  if (confirm(`Delete "${j.name}"?\n\nThis cannot be undone.`)) {
+    const idx = JOURNEYS.findIndex(x => x.id === id);
+    if (idx !== -1) JOURNEYS.splice(idx, 1);
+    renderAll(); toast('🗑 Campaign deleted');
+  }
+}
+
+function createNew() { openSetup(); }
+
+// ── TEMPLATE MODAL ──
+function openTemplates() {
+  document.getElementById('templateModal').classList.add('open');
+}
+function closeTemplates(e) {
+  if (!e || e.target === document.getElementById('templateModal')) {
+    document.getElementById('templateModal').classList.remove('open');
+  }
+}
+function useTemplate(name) {
+  document.getElementById('templateModal').classList.remove('open');
+  openSetup(name, true);
+}
+
+// ══════════════════════════════════════════════════
+//  CAMPAIGN SETUP OVERLAY
+// ══════════════════════════════════════════════════
+let setupFromTemplate = false;
+
+function openSetup(templateName, fromTemplate) {
+  setupFromTemplate = !!fromTemplate;
+  document.getElementById('setupOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setupStep = 1;
+  setupUpdateUI();
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('su-startDate').value = today;
+  if (templateName) {
+    document.getElementById('su-campaignName').value = templateName + ' Campaign';
+    suCountChars('su-campaignName','su-nameCount',250);
+  } else {
+    document.getElementById('su-campaignName').value = '';
+    suCountChars('su-campaignName','su-nameCount',250);
+  }
+}
+function closeSetup() {
+  document.getElementById('setupOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── SETUP STATE ──
+let setupStep = 1;
+let suOngoing = false, suDemo = false;
+let suEntryType = 'single', suReentry = false, suInterval = 'always', suCooldown = '1w';
+let suActiveDays = new Set();
+
+function setupUpdateUI() {
+  // screens
+  document.querySelectorAll('.su-screen').forEach((s,i) => s.classList.toggle('active', i+1 === setupStep));
+  // sidebar dots
+  for (let i = 1; i <= 3; i++) {
+    const el  = document.getElementById('su-step'+i);
+    const dot = document.getElementById('su-dot'+i);
+    el.classList.remove('active','done');
+    if (i < setupStep)       { el.classList.add('done');   dot.textContent = '✓'; }
+    else if (i === setupStep){ el.classList.add('active'); dot.textContent = i;   }
+    else                     { dot.textContent = i; }
+  }
+  // progress
+  const pct = Math.round(((setupStep-1)/2)*100);
+  document.getElementById('su-progressFill').style.width = pct + '%';
+  document.getElementById('su-progressLabel').textContent = `Step ${Math.min(setupStep,2)} of 2`;
+  // breadcrumb
+  const labels = ['Campaign Info','Participation Rules','Journey Canvas'];
+  document.getElementById('su-breadcrumb').textContent = labels[setupStep-1] || 'New Campaign';
+  // next button
+  const nb = document.getElementById('su-nextBtn');
+  nb.style.display = setupStep === 1 ? '' : 'none';
+  // scroll to top
+  const content = document.getElementById('su-content');
+  if (content) content.scrollTop = 0;
+}
+
+function suNext() {
+  if (setupStep === 1) {
+    if (!suValidate1()) return;
+    setupStep = 2; setupUpdateUI();
+  }
+}
+function suPrev() { if (setupStep > 1) { setupStep--; setupUpdateUI(); } }
+function suGoTo(n) { if (n < setupStep) { setupStep = n; setupUpdateUI(); } }
+
+function suValidate1() {
+  const name = document.getElementById('su-campaignName').value.trim();
+  const cat  = document.getElementById('su-campaignCategory').value;
+  if (!name) { suHighlight('su-campaignName'); return false; }
+  if (!cat)  { suHighlight('su-campaignCategory'); return false; }
+  return true;
+}
+function suHighlight(id) {
+  const el = document.getElementById(id);
+  el.style.borderColor = 'var(--red)';
+  el.style.boxShadow   = '0 0 0 3px rgba(248,113,113,0.12)';
+  el.focus();
+  setTimeout(() => { el.style.borderColor=''; el.style.boxShadow=''; }, 2000);
+}
+
+function suCountChars(inputId, countId, max) {
+  const el = document.getElementById(inputId);
+  const c  = document.getElementById(countId);
+  if (!el||!c) return;
+  const len = el.value.length;
+  c.textContent = `${len} / ${max}`;
+  c.className = 'su-char-count' + (len >= max ? ' over' : len > max*0.9 ? ' warn' : '');
+}
+function suCountWords(inputId, countId, max) {
+  const el = document.getElementById(inputId);
+  const c  = document.getElementById(countId);
+  if (!el||!c) return;
+  const words = el.value.trim() ? el.value.trim().split(/\s+/).length : 0;
+  c.textContent = `${words} / ${max} words`;
+  c.className = 'su-char-count' + (words >= max ? ' over' : words > max*0.9 ? ' warn' : '');
+  if (words > max) el.value = el.value.trim().split(/\s+/).slice(0,max).join(' ');
+}
+
+function suSetDemo(val) {
+  suDemo = val;
+  document.getElementById('su-demoYes').className = 'su-tpbtn' + (val  ? ' active yes' : '');
+  document.getElementById('su-demoNo').className  = 'su-tpbtn' + (!val ? ' active no'  : '');
+  document.getElementById('su-demoHint').textContent = val
+    ? 'Demo mode — test data only, no live players affected.'
+    : 'This campaign runs against live player data.';
+}
+function suToggleOngoing() {
+  suOngoing = !suOngoing;
+  document.getElementById('su-ongoingToggle').classList.toggle('active', suOngoing);
+  const ew = document.getElementById('su-endDateWrap');
+  ew.style.opacity       = suOngoing ? '0.35' : '1';
+  ew.style.pointerEvents = suOngoing ? 'none'  : '';
+  document.getElementById('su-endDate').disabled = suOngoing;
+  document.getElementById('su-dateSep').style.opacity = suOngoing ? '0.3' : '1';
+  document.getElementById('su-dateHint').textContent  = suOngoing
+    ? 'Campaign runs indefinitely from the start date.'
+    : 'Campaign runs from start date to end date.';
+}
+function suSetEntry(type) {
+  suEntryType = type;
+  document.getElementById('su-entrySingle').className = 'su-segbtn' + (type==='single' ? ' active' : '');
+  document.getElementById('su-entryMulti').className  = 'su-segbtn' + (type==='multi'  ? ' active' : '');
+  document.getElementById('su-entryBody').classList.toggle('open', type === 'multi');
+}
+function suSetReentry(val) {
+  suReentry = val;
+  document.getElementById('su-reentryYes').className = 'su-tpbtn' + (val  ? ' active yes' : '');
+  document.getElementById('su-reentryNo').className  = 'su-tpbtn' + (!val ? ' active no'  : '');
+  document.getElementById('su-reentryBody').classList.toggle('open', val);
+}
+function suSetInterval(type) {
+  suInterval = type;
+  document.getElementById('su-intAlways').className    = 'su-segbtn' + (type==='always'    ? ' active' : '');
+  document.getElementById('su-intScheduled').className = 'su-segbtn' + (type==='scheduled' ? ' active' : '');
+  document.getElementById('su-intervalBody').classList.toggle('open', type === 'scheduled');
+}
+function suToggleDay(btn) {
+  const d = btn.dataset.day;
+  suActiveDays.has(d) ? (suActiveDays.delete(d), btn.classList.remove('active'))
+                       : (suActiveDays.add(d),    btn.classList.add('active'));
+}
+function suApplyPreset(preset, e) {
+  const all=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const target = preset==='weekdays' ? new Set(['Mon','Tue','Wed','Thu','Fri'])
+               : preset==='weekends' ? new Set(['Sat','Sun']) : new Set(all);
+  suActiveDays = target;
+  document.querySelectorAll('.su-daybtn').forEach(b => b.classList.toggle('active', suActiveDays.has(b.dataset.day)));
+  document.querySelectorAll('.su-presetbtn').forEach(b => b.classList.remove('active'));
+  if (e?.target) e.target.classList.add('active');
+}
+function suSetCooldown(val) {
+  suCooldown = val;
+  ['su-coolNone','su-cool1d','su-cool1w','su-cool1m','su-coolCustom'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const idMap = {none:'su-coolNone','1d':'su-cool1d','1w':'su-cool1w','1m':'su-cool1m','custom':'su-coolCustom'};
+  const el = document.getElementById(idMap[val]);
+  if (el) el.classList.add('active');
+  document.getElementById('su-coolCustomWrap').style.display = val === 'custom' ? 'flex' : 'none';
+}
+function suLaunch() {
+  const name = document.getElementById('su-campaignName').value.trim() || 'Untitled Campaign';
+  const catEl = document.getElementById('su-campaignCategory');
+  const cat = catEl.options[catEl.selectedIndex]?.text?.split(' —')[0] || 'General';
+  const newId = Date.now();
+  closeSetup();
+  JOURNEYS.unshift({
+    id: newId, group:'design', name, status:'draft',
+    category: cat, type:'realtime',
+    players:0, nodes:0, progress:'0%', updated:'Just now',
+    fromTemplate: setupFromTemplate
+  });
+  renderAll();
+  // Navigate directly to canvas — template opens with demo, blank campaign opens empty
+  window.location.href = 'olives-builder-v11.html' + (setupFromTemplate ? '?demo=1' : '') + '#campaign-' + newId;
+}
+
+// ── TOAST ──
+let toastTimer;
+function toast(msg) {
+  let bar = document.getElementById('toastBar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'toastBar';
+    bar.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+      background:var(--surface2);border:1px solid var(--border2);border-left:2px solid var(--accent);
+      border-radius:8px;padding:9px 18px;font-size:12px;font-family:IBM Plex Mono,monospace;
+      color:var(--text);box-shadow:0 6px 24px rgba(0,0,0,0.5);z-index:1000;white-space:nowrap;
+      animation:fadeUp 0.2s ease`;
+    document.body.appendChild(bar);
+  }
+  bar.textContent = msg;
+  bar.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => bar.style.display = 'none', 2800);
+}
+
+// ── INIT ──
+renderAll();
+</script>
+
+<!-- ══════════════════════════════════════
+     CAMPAIGN SETUP OVERLAY
+══════════════════════════════════════ -->
+<style>
+/* ── OVERLAY SHELL ── */
+#setupOverlay{
+  position:fixed;inset:0;z-index:400;
+  background:var(--bg);
+  display:none;flex-direction:column;
+  animation:none;
+}
+#setupOverlay.open{display:flex;animation:suSlideIn 0.28s ease}
+@keyframes suSlideIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SETUP TOPBAR ── */
+.su-topbar{
+  height:54px;flex-shrink:0;
+  background:rgba(22,25,33,0.97);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 28px;gap:0;z-index:10;
+}
+.su-breadcrumb-wrap{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)}
+.su-bc-item{color:var(--text2);cursor:pointer}
+.su-bc-item:hover{color:var(--text)}
+.su-bc-sep{color:var(--text3)}
+.su-bc-active{color:var(--text)}
+.su-topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* ── SETUP BODY ── */
+.su-shell{display:flex;flex:1;overflow:hidden}
+
+/* ── SETUP SIDEBAR ── */
+.su-sidebar{
+  width:256px;flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:32px 22px;display:flex;flex-direction:column;
+}
+.su-sidebar-heading{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:26px}
+.su-step-list{display:flex;flex-direction:column}
+.su-step-item{display:flex;align-items:flex-start;gap:13px;padding:13px 0;position:relative;cursor:pointer}
+.su-step-item:not(:last-child)::after{content:'';position:absolute;left:14px;top:42px;width:2px;height:calc(100% - 14px);background:var(--border2)}
+.su-step-item.done:not(:last-child)::after{background:var(--accent2)}
+.su-step-dot{
+  width:28px;height:28px;flex-shrink:0;border-radius:50%;
+  border:2px solid var(--border2);background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--text3);position:relative;z-index:1;transition:all 0.22s;
+}
+.su-step-item.active .su-step-dot{border-color:var(--accent);background:rgba(74,222,128,0.1);color:var(--accent);box-shadow:0 0 0 4px rgba(74,222,128,0.07)}
+.su-step-item.done   .su-step-dot{border-color:var(--accent2);background:var(--accent2);color:#fff}
+.su-step-title{font-size:13px;font-weight:600;color:var(--text3);padding-top:4px;transition:color 0.18s}
+.su-step-sub{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4}
+.su-step-item.active .su-step-title{color:var(--text)}
+.su-step-item.done   .su-step-title{color:var(--text2)}
+
+.su-sidebar-footer{margin-top:auto;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px}
+.su-sf-label{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.su-sf-val{font-size:12px;font-weight:600;color:var(--text2);font-family:'IBM Plex Mono',monospace}
+.su-progress-bar{height:3px;background:var(--border2);border-radius:2px;margin-top:10px;overflow:hidden}
+.su-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;transition:width 0.38s ease}
+
+/* ── SETUP CONTENT ── */
+.su-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:44px 56px;scroll-behavior:smooth}
+.su-content::-webkit-scrollbar{width:4px}
+.su-content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── SCREENS ── */
+.su-screen{display:none}
+.su-screen.active{display:block;animation:suFadeIn 0.24s ease}
+@keyframes suFadeIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── PAGE HEADER ── */
+.su-page-header{margin-bottom:44px}
+.su-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.su-eyebrow::before{content:'';width:18px;height:2px;background:var(--accent);border-radius:1px}
+.su-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:8px}
+.su-desc{font-size:14px;color:var(--text2);line-height:1.6;max-width:540px}
+
+/* ── FORM ── */
+.su-section{margin-bottom:38px}
+.su-section-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.su-field-row{display:grid;gap:18px;margin-bottom:18px}
+.su-field-row.c2{grid-template-columns:1fr 1fr}
+.su-field-row.c1{grid-template-columns:1fr}
+.su-field-group{display:flex;flex-direction:column;gap:7px}
+.su-label{font-size:12px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:8px}
+.su-req{color:var(--accent);font-size:10px}
+.su-hint{font-size:11px;color:var(--text3);line-height:1.5;margin-top:3px}
+.su-char-count{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text3);margin-left:auto}
+.su-char-count.warn{color:var(--amber)}
+.su-char-count.over{color:var(--red)}
+
+.su-input{
+  background:var(--surface2);border:1px solid var(--border2);border-radius:9px;
+  padding:11px 14px;font-size:13px;font-family:'Outfit',sans-serif;
+  color:var(--text);outline:none;transition:all 0.17s;width:100%;
+}
+.su-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,222,128,0.08)}
+.su-input::placeholder{color:var(--text3)}
+.su-input:disabled{opacity:0.4;cursor:not-allowed}
+textarea.su-input{resize:vertical;min-height:110px;line-height:1.6}
+
+.su-select{
+  background:var(--surface2);border:1px solid var(--border2);border-radius:9px;
+  padding:11px 14px;font-size:13px;font-family:'Outfit',sans-serif;
+  color:var(--text);outline:none;transition:all 0.17s;width:100%;cursor:pointer;
+  appearance:none;padding-right:36px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5270' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;
+}
+.su-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,222,128,0.08)}
+.su-select option{background:var(--surface2)}
+
+/* ── TOGGLE PILL ── */
+.su-tp{display:inline-flex;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:3px;gap:2px}
+.su-tpbtn{padding:8px 18px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;border:none;cursor:pointer;color:var(--text3);background:transparent;transition:all 0.17s}
+.su-tpbtn.active{background:var(--surface3);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+.su-tpbtn.active.yes{background:rgba(74,222,128,0.12);color:var(--accent)}
+.su-tpbtn.active.no{background:rgba(248,113,113,0.1);color:var(--red)}
+
+/* ── SEGMENT ── */
+.su-seg{display:inline-flex;flex-wrap:wrap;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:3px;gap:2px}
+.su-segbtn{padding:8px 14px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;border:none;cursor:pointer;color:var(--text3);background:transparent;transition:all 0.17s;white-space:nowrap}
+.su-segbtn.active{background:rgba(74,222,128,0.12);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.25)}
+
+/* ── DATE ROW ── */
+.su-date-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.su-date-col{display:flex;flex-direction:column;gap:5px;flex:1;min-width:150px}
+.su-date-sublabel{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3)}
+.su-date-sep{font-size:13px;color:var(--text3);padding-bottom:12px}
+
+/* ── ONGOING ── */
+.su-ongoing{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;cursor:pointer;user-select:none;transition:all 0.16s;align-self:flex-end;margin-bottom:0}
+.su-ongoing:hover{border-color:var(--border3)}
+.su-ongoing.active{border-color:var(--accent);background:rgba(74,222,128,0.06)}
+.su-ot-sw{width:30px;height:17px;border-radius:9px;background:var(--surface3);position:relative;transition:background 0.2s;flex-shrink:0}
+.su-ongoing.active .su-ot-sw{background:var(--accent2)}
+.su-ot-sw::after{content:'';position:absolute;top:2.5px;left:2.5px;width:12px;height:12px;border-radius:50%;background:#fff;transition:left 0.2s}
+.su-ongoing.active .su-ot-sw::after{left:15.5px}
+.su-ot-lbl{font-size:12px;font-weight:600;color:var(--text2)}
+.su-ongoing.active .su-ot-lbl{color:var(--accent)}
+
+/* ── RULE CARD ── */
+.su-rule-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:14px}
+.su-rule-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;gap:12px}
+.su-rule-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:9px}
+.su-rule-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.su-rule-desc{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5}
+.su-rule-body{margin-top:18px;padding-top:18px;border-top:1px solid var(--border);display:none}
+.su-rule-body.open{display:block;animation:suFadeIn 0.18s ease}
+
+/* ── NUM INPUT ── */
+.su-num-wrap{display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;overflow:hidden;transition:border-color 0.17s}
+.su-num-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,222,128,0.08)}
+.su-num-wrap input{background:transparent;border:none;outline:none;padding:11px 13px;font-size:13px;font-family:'Outfit',sans-serif;color:var(--text);width:100%}
+.su-num-wrap input::placeholder{color:var(--text3)}
+.su-num-suffix{padding:0 13px;font-size:12px;font-weight:600;color:var(--text3);border-left:1px solid var(--border);background:var(--surface3);min-height:42px;display:flex;align-items:center;white-space:nowrap}
+
+/* ── DAY PICKER ── */
+.su-day-picker{display:flex;gap:5px;flex-wrap:wrap}
+.su-daybtn{width:42px;height:42px;border-radius:9px;font-size:11px;font-weight:700;border:1px solid var(--border2);background:var(--surface2);color:var(--text3);cursor:pointer;transition:all 0.14s;font-family:'Outfit',sans-serif}
+.su-daybtn:hover{border-color:var(--border3);color:var(--text2)}
+.su-daybtn.active{border-color:var(--accent);background:rgba(74,222,128,0.1);color:var(--accent)}
+
+.su-presets{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.su-presetbtn{padding:6px 13px;border-radius:7px;font-size:11px;font-weight:600;border:1px solid var(--border2);background:var(--surface2);color:var(--text3);cursor:pointer;transition:all 0.14s;font-family:'Outfit',sans-serif}
+.su-presetbtn:hover{border-color:var(--border3);color:var(--text2)}
+.su-presetbtn.active{border-color:var(--blue);background:rgba(96,165,250,0.08);color:var(--blue)}
+
+/* ── NOTICE ── */
+.su-notice{display:flex;gap:9px;padding:11px 13px;border-radius:9px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);font-size:12px;color:#fbbf24;line-height:1.5;margin-top:10px}
+.su-notice.green{background:rgba(74,222,128,0.06);border-color:rgba(74,222,128,0.15);color:var(--accent)}
+
+/* ── FORM FOOTER ── */
+.su-form-footer{display:flex;align-items:center;justify-content:space-between;margin-top:48px;padding-top:26px;border-top:1px solid var(--border)}
+.su-footer-note{font-size:12px;color:var(--text3)}
+
+/* ── DATE INPUT ── */
+input[type=date].su-input::-webkit-calendar-picker-indicator{filter:invert(0.4) sepia(1) hue-rotate(180deg);cursor:pointer;opacity:0.6}
+</style>
+
+<div id="setupOverlay">
+  <!-- TOPBAR -->
+  <div class="su-topbar">
+    <div class="logo">
+      <div class="logo-mark">🫒</div>
+      <div class="logo-text">Olives Builder</div>
+    </div>
+    <div style="width:1px;height:26px;background:var(--border);margin:0 18px"></div>
+    <div class="su-breadcrumb-wrap">
+      <span class="su-bc-item" onclick="closeSetup()">Campaigns</span>
+      <span class="su-bc-sep">›</span>
+      <span class="su-bc-item" onclick="closeSetup()">New Campaign</span>
+      <span class="su-bc-sep">›</span>
+      <span class="su-bc-active" id="su-breadcrumb">Campaign Info</span>
+    </div>
+    <div class="su-topbar-right">
+      <button class="btn btn-ghost" onclick="closeSetup()">✕ Cancel</button>
+      <button class="btn btn-primary" id="su-nextBtn" onclick="suNext()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="su-shell">
+    <!-- SIDEBAR -->
+    <aside class="su-sidebar">
+      <div class="su-sidebar-heading">Setup Steps</div>
+      <div class="su-step-list">
+        <div class="su-step-item active" id="su-step1" onclick="suGoTo(1)">
+          <div class="su-step-dot" id="su-dot1">1</div>
+          <div><div class="su-step-title">Campaign Info</div><div class="su-step-sub">Name, category & timeframe</div></div>
+        </div>
+        <div class="su-step-item" id="su-step2" onclick="suGoTo(2)">
+          <div class="su-step-dot" id="su-dot2">2</div>
+          <div><div class="su-step-title">Participation Rules</div><div class="su-step-sub">Entry, re-entry & scheduling</div></div>
+        </div>
+        <div class="su-step-item" id="su-step3">
+          <div class="su-step-dot" id="su-dot3">3</div>
+          <div><div class="su-step-title">Build Journey</div><div class="su-step-sub">Canvas — nodes & logic</div></div>
+        </div>
+      </div>
+      <div class="su-sidebar-footer">
+        <div class="su-sf-label">Completion</div>
+        <div class="su-sf-val" id="su-progressLabel">Step 1 of 2</div>
+        <div class="su-progress-bar"><div class="su-progress-fill" id="su-progressFill" style="width:0%"></div></div>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <div class="su-content" id="su-content">
+
+      <!-- ═══ SCREEN 1 ═══ -->
+      <div class="su-screen active" id="su-screen1">
+        <div class="su-page-header">
+          <div class="su-eyebrow">Step 1</div>
+          <div class="su-title">Campaign Information</div>
+          <div class="su-desc">Define the core identity of your campaign — its name, purpose and time boundaries.</div>
+        </div>
+
+        <div class="su-section">
+          <div class="su-section-label">Identity</div>
+          <div class="su-field-row c1">
+            <div class="su-field-group">
+              <div class="su-label">Campaign Name <span class="su-req">required</span><span class="su-char-count" id="su-nameCount">0 / 250</span></div>
+              <input class="su-input" type="text" id="su-campaignName" maxlength="250" placeholder="e.g. Summer Re-engagement Q3 2025" oninput="suCountChars('su-campaignName','su-nameCount',250)" autocomplete="off"/>
+              <div class="su-hint">A clear, descriptive name helps your team identify this campaign.</div>
+            </div>
+          </div>
+          <div class="su-field-row c2">
+            <div class="su-field-group">
+              <div class="su-label">Category <span class="su-req">required</span></div>
+              <select class="su-select" id="su-campaignCategory">
+                <option value="" disabled selected>Select a category…</option>
+                <option value="acquisition">Acquisition — attract new players</option>
+                <option value="conversion">Conversion — turn prospects into depositors</option>
+                <option value="retention">Retention — keep active players engaged</option>
+                <option value="reactivation">Reactivation — bring back lapsed players</option>
+                <option value="general">General — no specific funnel stage</option>
+              </select>
+            </div>
+            <div class="su-field-group">
+              <div class="su-label">Demo Campaign?</div>
+              <div class="su-tp">
+                <button class="su-tpbtn active no" id="su-demoNo" onclick="suSetDemo(false)">No — Live</button>
+                <button class="su-tpbtn" id="su-demoYes" onclick="suSetDemo(true)">Yes — Demo</button>
+              </div>
+              <div class="su-hint" id="su-demoHint">This campaign runs against live player data.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="su-section">
+          <div class="su-section-label">Timeframe</div>
+          <div class="su-field-group">
+            <div class="su-label">Campaign Duration</div>
+            <div class="su-date-row">
+              <div class="su-date-col">
+                <div class="su-date-sublabel">Start Date</div>
+                <input class="su-input" type="date" id="su-startDate"/>
+              </div>
+              <div class="su-date-sep" id="su-dateSep">→</div>
+              <div class="su-date-col" id="su-endDateWrap">
+                <div class="su-date-sublabel">End Date</div>
+                <input class="su-input" type="date" id="su-endDate"/>
+              </div>
+              <div class="su-ongoing" id="su-ongoingToggle" onclick="suToggleOngoing()" style="align-self:flex-end;margin-bottom:0">
+                <div class="su-ot-sw"></div>
+                <span class="su-ot-lbl">Ongoing</span>
+              </div>
+            </div>
+            <div class="su-hint" id="su-dateHint">Campaign runs from start date to end date.</div>
+          </div>
+        </div>
+
+        <div class="su-section">
+          <div class="su-section-label">Notes</div>
+          <div class="su-field-group">
+            <div class="su-label">Campaign Notes <span class="su-char-count" id="su-wordCount">0 / 1000 words</span></div>
+            <textarea class="su-input" id="su-comments" rows="5" placeholder="Add context, objectives, or notes for your team…" oninput="suCountWords('su-comments','su-wordCount',1000)"></textarea>
+            <div class="su-hint">Describe the campaign goal, target audience, or any special rules.</div>
+          </div>
+        </div>
+
+        <div class="su-form-footer">
+          <div class="su-footer-note">Fields marked <span style="color:var(--accent)">required</span> must be filled to continue.</div>
+          <button class="btn btn-primary" onclick="suNext()">Continue to Participation Rules →</button>
+        </div>
+      </div>
+
+      <!-- ═══ SCREEN 2 ═══ -->
+      <div class="su-screen" id="su-screen2">
+        <div class="su-page-header">
+          <div class="su-eyebrow">Step 2</div>
+          <div class="su-title">Participation Rules</div>
+          <div class="su-desc">Control who can enter, how many times, and when the campaign accepts participants.</div>
+        </div>
+
+        <!-- Entry Type -->
+        <div class="su-section">
+          <div class="su-section-label">Entry Mode</div>
+          <div class="su-rule-card">
+            <div class="su-rule-header">
+              <div>
+                <div class="su-rule-title"><div class="su-rule-icon" style="background:rgba(74,222,128,0.1)">🚪</div>Entry Type</div>
+                <div class="su-rule-desc">Can a player enter this campaign once or multiple times?</div>
+              </div>
+              <div class="su-seg">
+                <button class="su-segbtn active" id="su-entrySingle" onclick="suSetEntry('single')">Single Entry</button>
+                <button class="su-segbtn" id="su-entryMulti" onclick="suSetEntry('multi')">Multi Entry</button>
+              </div>
+            </div>
+            <div class="su-rule-body" id="su-entryBody">
+              <div class="su-field-row c2">
+                <div class="su-field-group">
+                  <div class="su-label">Participant Cap</div>
+                  <div class="su-num-wrap"><input type="number" id="su-entryCap" placeholder="No cap" min="1"/><div class="su-num-suffix">players max</div></div>
+                  <div class="su-hint">Leave empty for unlimited. Once reached, new entries stop.</div>
+                </div>
+              </div>
+              <div class="su-notice">⚠ When the cap is reached, existing participants continue unaffected.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Re-entry -->
+        <div class="su-section">
+          <div class="su-section-label">Re-entry</div>
+          <div class="su-rule-card">
+            <div class="su-rule-header">
+              <div>
+                <div class="su-rule-title"><div class="su-rule-icon" style="background:rgba(96,165,250,0.1)">🔄</div>Allow Re-entry</div>
+                <div class="su-rule-desc">Can a player who finished or exited the journey re-enter it?</div>
+              </div>
+              <div class="su-tp">
+                <button class="su-tpbtn active no" id="su-reentryNo" onclick="suSetReentry(false)">No</button>
+                <button class="su-tpbtn" id="su-reentryYes" onclick="suSetReentry(true)">Yes</button>
+              </div>
+            </div>
+            <div class="su-rule-body" id="su-reentryBody">
+              <div class="su-field-row c2">
+                <div class="su-field-group">
+                  <div class="su-label">Max Re-entries per Player</div>
+                  <div class="su-num-wrap"><input type="number" id="su-reentryMax" placeholder="Unlimited" min="1"/><div class="su-num-suffix">times</div></div>
+                  <div class="su-hint">Leave empty to allow unlimited re-entries.</div>
+                </div>
+              </div>
+              <div class="su-notice green">✓ Useful for weekly bonuses, recurring missions or seasonal campaigns.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interval -->
+        <div class="su-section">
+          <div class="su-section-label">Campaign Interval</div>
+          <div class="su-rule-card">
+            <div class="su-rule-header">
+              <div>
+                <div class="su-rule-title"><div class="su-rule-icon" style="background:rgba(245,158,11,0.1)">📅</div>Active Window</div>
+                <div class="su-rule-desc">When is this campaign open to new entries?</div>
+              </div>
+              <div class="su-seg">
+                <button class="su-segbtn active" id="su-intAlways" onclick="suSetInterval('always')">Always Active</button>
+                <button class="su-segbtn" id="su-intScheduled" onclick="suSetInterval('scheduled')">Scheduled Days</button>
+              </div>
+            </div>
+            <div class="su-rule-body" id="su-intervalBody">
+              <div style="margin-bottom:18px">
+                <div class="su-label" style="margin-bottom:10px">Active Days</div>
+                <div class="su-day-picker">
+                  <button class="su-daybtn" data-day="Mon" onclick="suToggleDay(this)">Mon</button>
+                  <button class="su-daybtn" data-day="Tue" onclick="suToggleDay(this)">Tue</button>
+                  <button class="su-daybtn" data-day="Wed" onclick="suToggleDay(this)">Wed</button>
+                  <button class="su-daybtn" data-day="Thu" onclick="suToggleDay(this)">Thu</button>
+                  <button class="su-daybtn" data-day="Fri" onclick="suToggleDay(this)">Fri</button>
+                  <button class="su-daybtn" data-day="Sat" onclick="suToggleDay(this)">Sat</button>
+                  <button class="su-daybtn" data-day="Sun" onclick="suToggleDay(this)">Sun</button>
+                </div>
+                <div class="su-presets">
+                  <button class="su-presetbtn" onclick="suApplyPreset('weekdays',event)">Weekdays only</button>
+                  <button class="su-presetbtn" onclick="suApplyPreset('weekends',event)">Weekends only</button>
+                  <button class="su-presetbtn" onclick="suApplyPreset('all',event)">Every day</button>
+                </div>
+              </div>
+              <div style="padding-top:18px;border-top:1px solid var(--border)">
+                <div class="su-label" style="margin-bottom:8px">Entry Cooldown</div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                  <div class="su-seg">
+                    <button class="su-segbtn" id="su-coolNone" onclick="suSetCooldown('none')">None</button>
+                    <button class="su-segbtn" id="su-cool1d" onclick="suSetCooldown('1d')">1 Day</button>
+                    <button class="su-segbtn active" id="su-cool1w" onclick="suSetCooldown('1w')">1 Week</button>
+                    <button class="su-segbtn" id="su-cool1m" onclick="suSetCooldown('1m')">1 Month</button>
+                    <button class="su-segbtn" id="su-coolCustom" onclick="suSetCooldown('custom')">Custom</button>
+                  </div>
+                  <div id="su-coolCustomWrap" style="display:none">
+                    <div class="su-num-wrap" style="width:160px">
+                      <input type="number" placeholder="e.g. 3" min="1"/>
+                      <div class="su-num-suffix">
+                        <select style="background:transparent;border:none;outline:none;color:var(--text3);font-family:Outfit,sans-serif;font-size:12px;cursor:pointer">
+                          <option>days</option><option>weeks</option><option>months</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="su-hint" style="margin-top:7px">Time a player must wait before they can enter again.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="su-form-footer">
+          <button class="btn btn-ghost" onclick="suPrev()">← Back</button>
+          <button class="btn btn-primary" onclick="suLaunch()">Create Campaign & Build Journey →</button>
+        </div>
+      </div>
+
+    </div><!-- /su-content -->
+  </div><!-- /su-shell -->
+</div><!-- /setupOverlay -->
+
+</body>
+</html>
