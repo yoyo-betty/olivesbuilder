@@ -890,7 +890,10 @@ document.addEventListener('click', closeAllMenus);
 function goToCanvas(id) {
   closeAllMenus();
   const j = JOURNEYS.find(x => x.id === id);
-  alert(`→ Opening canvas for:\n"${j?.name}"\n\n(In production this navigates to olives-builder.html?campaign=${id})`);
+  if (!j) return;
+  // Templates open with demo data; regular journeys open empty canvas
+  const isTemplate = j.fromTemplate;
+  window.location.href = 'olives-builder-v11.html' + (isTemplate ? '?demo=1' : '') + '#campaign-' + id;
 }
 
 function activateJourney(id) {
@@ -968,23 +971,27 @@ function closeTemplates(e) {
 }
 function useTemplate(name) {
   document.getElementById('templateModal').classList.remove('open');
-  openSetup(name);
+  openSetup(name, true);
 }
 
 // ══════════════════════════════════════════════════
 //  CAMPAIGN SETUP OVERLAY
 // ══════════════════════════════════════════════════
-function openSetup(templateName) {
+let setupFromTemplate = false;
+
+function openSetup(templateName, fromTemplate) {
+  setupFromTemplate = !!fromTemplate;
   document.getElementById('setupOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-  // reset to step 1
   setupStep = 1;
   setupUpdateUI();
-  // set today as default start date
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('su-startDate').value = today;
   if (templateName) {
     document.getElementById('su-campaignName').value = templateName + ' Campaign';
+    suCountChars('su-campaignName','su-nameCount',250);
+  } else {
+    document.getElementById('su-campaignName').value = '';
     suCountChars('su-campaignName','su-nameCount',250);
   }
 }
@@ -1133,15 +1140,19 @@ function suSetCooldown(val) {
 }
 function suLaunch() {
   const name = document.getElementById('su-campaignName').value.trim() || 'Untitled Campaign';
+  const catEl = document.getElementById('su-campaignCategory');
+  const cat = catEl.options[catEl.selectedIndex]?.text?.split(' —')[0] || 'General';
+  const newId = Date.now();
   closeSetup();
-  // Add to journey list as draft
   JOURNEYS.unshift({
-    id: Date.now(), group:'design', name, status:'draft',
-    category: document.getElementById('su-campaignCategory').options[document.getElementById('su-campaignCategory').selectedIndex]?.text?.split(' —')[0] || 'General',
-    type:'realtime', players:0, nodes:0, progress:'0%', updated:'Just now'
+    id: newId, group:'design', name, status:'draft',
+    category: cat, type:'realtime',
+    players:0, nodes:0, progress:'0%', updated:'Just now',
+    fromTemplate: setupFromTemplate
   });
   renderAll();
-  toast(`✓ "${name}" created — open it to start building`);
+  // Navigate directly to canvas — template opens with demo, blank campaign opens empty
+  window.location.href = 'olives-builder-v11.html' + (setupFromTemplate ? '?demo=1' : '') + '#campaign-' + newId;
 }
 
 // ── TOAST ──
