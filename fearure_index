@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olives Builder — Full Feature Index v3</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #181b25;
+    --border: #1e2330;
+    --text: #e8eaf0;
+    --muted: #4a5068;
+    --accent: #c8f135;
+    --c-canvas: #c8f135;
+    --c-node: #38bdf8;
+    --c-flow: #a78bfa;
+    --c-activity: #f472b6;
+    --c-comms: #fb923c;
+    --c-data: #34d399;
+    --c-condition: #facc15;
+    --c-monitor: #f87171;
+    --c-trigger: #818cf8;
+    --c-setup: #22d3ee;
+    --c-support: #f59e0b;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 40px 32px 80px;
+  }
+
+  header {
+    margin-bottom: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .stats {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    flex: 1;
+    min-width: 110px;
+  }
+
+  .stat-num { font-size: 28px; font-weight: 800; color: var(--text); }
+  .stat-num.accent { color: var(--accent); }
+  .stat-num.cyan { color: var(--c-setup); }
+  .stat-num.amber { color: var(--c-support); }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .section { margin-bottom: 36px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-color { width: 3px; height: 20px; border-radius: 2px; flex-shrink:0; }
+  .section-title { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .section-zone { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); margin-left: auto; }
+  .section-count { font-family: 'DM Mono', monospace; font-size: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: var(--surface2); }
+  th {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted); text-align: left;
+    padding: 10px 14px; border-bottom: 1px solid var(--border); font-weight: 500;
+  }
+  td { padding: 11px 14px; vertical-align: top; border-bottom: 1px solid rgba(30,35,48,0.7); }
+  tr:hover td { background: rgba(255,255,255,0.015); }
+
+  .feat-id { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+  .feat-name { font-weight: 700; color: var(--text); white-space: nowrap; }
+  .feat-desc { color: #8b92ae; font-size: 12px; line-height: 1.55; }
+  .feat-ux { color: #636b8a; font-size: 11px; font-style: italic; line-height: 1.5; }
+
+  .badge {
+    display: inline-block; font-family: 'DM Mono', monospace; font-size: 9px;
+    padding: 2px 8px; border-radius: 4px; letter-spacing: 0.06em; white-space: nowrap;
+  }
+
+  .b-mvp    { background: rgba(200,241,53,0.1);  color: var(--accent);   border: 1px solid rgba(200,241,53,0.25); }
+  .b-built  { background: rgba(34,211,238,0.1);  color: var(--c-setup);  border: 1px solid rgba(34,211,238,0.25); }
+  .b-phase2 { background: rgba(74,80,104,0.3);   color: var(--muted);    border: 1px solid var(--border); }
+  .b-infra  { background: rgba(245,158,11,0.1);  color: var(--c-support);border: 1px solid rgba(245,158,11,0.25); }
+  .b-ext    { background: rgba(167,139,250,0.1); color: #a78bfa;         border: 1px solid rgba(167,139,250,0.25); }
+
+  .sub-items { margin-top: 4px; padding-left: 0; list-style: none; }
+  .sub-items li { font-size: 11px; color: #636b8a; padding: 1px 0; }
+  .sub-items li::before { content: '→ '; color: var(--muted); }
+
+  /* support section rows get amber left border */
+  .support-row td { border-left: 2px solid var(--c-support); }
+
+  .divider {
+    margin: 48px 0 36px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .divider-line { flex:1; height:1px; background: var(--border); }
+  .divider-label {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); padding: 4px 14px;
+    border: 1px solid var(--border); border-radius: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="label">Olives Builder · Master Feature Index v3 · Feb 2026</div>
+    <h1>Full Feature <span>Index</span></h1>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:var(--accent)"></div>MVP — first build</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--c-setup)"></div>Built today</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--muted)"></div>Phase 2</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--c-support)"></div>Supporting infrastructure</div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat-card"><div class="stat-num accent">49</div><div class="stat-label">Builder Features</div></div>
+  <div class="stat-card"><div class="stat-num cyan">11</div><div class="stat-label">Built Today</div></div>
+  <div class="stat-card"><div class="stat-num accent">22</div><div class="stat-label">MVP Scope</div></div>
+  <div class="stat-card"><div class="stat-num amber">9</div><div class="stat-label">Supporting Dev Items</div></div>
+  <div class="stat-card"><div class="stat-num">58</div><div class="stat-label">Total Items</div></div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 0: CAMPAIGN SETUP (NEW TODAY)
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-setup)"></div>
+    <span class="section-title" style="color:var(--c-setup)">Campaign Setup Flow</span>
+    <span class="section-count">6 features</span>
+    <span class="section-zone">Pre-canvas setup screens</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">CS-01</td>
+        <td class="feat-name">Journey Manager Homepage</td>
+        <td class="feat-desc">Central dashboard listing all journeys organised into Active, In Design, and Completed sections. Gives the CRM team instant visibility of every campaign's status, player counts and conversion rates from one screen.</td>
+        <td class="feat-ux">Three grouped table sections. Each row shows name, status badge, player count, conversion rate, sparkline and last-updated. Click row name or open via 3-dot menu to enter canvas. Stats summary cards at top.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CS-02</td>
+        <td class="feat-name">Campaign Actions Menu</td>
+        <td class="feat-desc">Per-row 3-dot menu giving operators quick access to all lifecycle actions on a journey without entering the canvas. Available actions are context-aware — only valid transitions are shown per current status.</td>
+        <td class="feat-ux">3-dot button on every row opens a positioned dropdown. Actions: Open in Canvas, Activate, Pause/Resume, Mark Complete, Block, Duplicate, Delete. Dangerous actions (Delete) separated and coloured red.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CS-03</td>
+        <td class="feat-name">Create Campaign — Screen 1 (Info)</td>
+        <td class="feat-desc">First step of the two-screen campaign creation wizard. Captures the core identity fields required before a canvas can be built. Validates required fields before allowing progression to step 2.</td>
+        <td class="feat-ux">Campaign name (250 char, live counter), category selector (Acquisition / Conversion / Retention / Reactivation / General), Demo/Live toggle, start/end date pickers with Ongoing toggle that disables end date, 1000-word notes field with live word counter.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CS-04</td>
+        <td class="feat-name">Create Campaign — Screen 2 (Participation)</td>
+        <td class="feat-desc">Second wizard step defining the rules that control how and when players can participate in the campaign. Each rule card expands when enabled, revealing relevant configuration.</td>
+        <td class="feat-ux">Entry Type (Single/Multi — Multi reveals participant cap field), Re-entry toggle (reveals max re-entries field), Campaign Interval (Always Active / Scheduled Days — reveals day picker with Mon–Sun toggles, quick presets, and Entry Cooldown selector with None/1 Day/1 Week/1 Month/Custom options).</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CS-05</td>
+        <td class="feat-name">Start from Template</td>
+        <td class="feat-desc">Allows admins to bootstrap a new campaign from a pre-built journey template. Template library covers common use-cases so the team doesn't start from a blank canvas for standard campaigns.</td>
+        <td class="feat-ux">Modal opened by "From Template" button. Grid of 6 templates: Welcome Series, Churn Prevention, VIP Upgrade, Tournament Push, Lapsed Player Reactivation, Deposit Match Campaign. Each card shows icon, name, description and tags (category + node count). Selecting a template pre-fills campaign name and opens canvas with pre-built nodes.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CS-06</td>
+        <td class="feat-name">Wizard Progress Sidebar</td>
+        <td class="feat-desc">Persistent left sidebar during the setup flow showing the three-step progress (Campaign Info → Participation Rules → Build Journey). Keeps the admin oriented during multi-step setup and allows backwards navigation.</td>
+        <td class="feat-ux">Connected dot-and-line step list. Active step glows green, completed steps show tick. Progress bar and step label in footer card. Breadcrumb in topbar updates per step. Back navigation allowed; forward only after validation passes.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 1: CANVAS WORKSPACE
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-canvas)"></div>
+    <span class="section-title" style="color:var(--c-canvas)">Canvas Workspace</span>
+    <span class="section-count">8 features</span>
+    <span class="section-zone">Zone ② Main Canvas</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">C-01</td>
+        <td class="feat-name">Visual Canvas</td>
+        <td class="feat-desc">The central drag-and-drop workspace where admins design, connect, and monitor journeys. Serves simultaneously as design board and live control room.</td>
+        <td class="feat-ux">Infinite pan + zoom. Nodes snap to grid. Background dot-grid for alignment. Canvas opens empty — trigger gate shown on first open.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">C-02</td>
+        <td class="feat-name">Zoom & Pan Controls</td>
+        <td class="feat-desc">Allows admins to navigate large journey flows. Zoom in for detail, zoom out for overview. Mouse wheel + space-drag supported. Fit-all button centres all content.</td>
+        <td class="feat-ux">Toolbar zoom buttons + scroll wheel. Space-bar hold activates pan mode. ⊞ Fit button auto-scales viewport to show all nodes. Zoom capped at 20%–200%.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">C-03</td>
+        <td class="feat-name">Minimap Overview Panel</td>
+        <td class="feat-desc">A thumbnail of the entire journey in the bottom corner. Shows current viewport position as a highlighted rectangle. Click-to-jump to any area of a large flow.</td>
+        <td class="feat-ux">Always-visible corner widget. Highlighted viewport rectangle. Click anywhere on minimap to navigate.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">C-04</td>
+        <td class="feat-name">Undo / Redo</td>
+        <td class="feat-desc">Full snapshot-based action history allowing admins to reverse or reapply any canvas action — node additions, deletions, connections. Stack capped at 40 snapshots; any new action clears the redo stack.</td>
+        <td class="feat-ux">Ctrl+Z / Ctrl+Y (or Ctrl+Shift+Z) keyboard shortcuts + toolbar buttons. Deep JSON clone of full state per snapshot.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">C-05</td>
+        <td class="feat-name">Drag-and-Drop Node Placement</td>
+        <td class="feat-desc">Admins drag node types from the left palette onto placeholder slots on the canvas. A floating ghost card follows the cursor during drag; placeholder slots highlight on hover. Snap-to-nearest within 80px on release.</td>
+        <td class="feat-ux">Mousedown on palette item → ghost card appears. Placeholder slots glow green on hover. Release on valid slot fills it instantly. Release outside valid zone shows hint. Drag-to-connect and palette drag use independent event paths to avoid conflict.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">C-06</td>
+        <td class="feat-name">Smart Fork Branch Spacing</td>
+        <td class="feat-desc">When a fork node (condition, random split, event split) is placed, its branches are automatically spaced vertically centred on the fork with BRANCH_GAP=2 row-slots between siblings. A row-push algorithm shifts any conflicting downstream nodes down to prevent overlap.</td>
+        <td class="feat-ux">Branches spread symmetrically around fork row. shiftSubtree() recursively moves entire downstream chains together. repack() acts as safety net only — never flattens intentional gaps.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">C-07</td>
+        <td class="feat-name">Node Deletion (All Types)</td>
+        <td class="feat-desc">Every node including the trigger is deleteable. Regular nodes soft-delete to a ghost placeholder slot. Fork nodes show a confirm dialog listing downstream node count before hard-deleting the entire branch. Deleting the trigger resets the canvas to trigger-selection gate.</td>
+        <td class="feat-ux">Trash icon on every node card. Confirm dialog for fork/trigger deletion. Soft-deleted slots remain visible with dashed border for re-use. Trigger deletion shows "Reset Journey" confirm with clear warning copy.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">C-08</td>
+        <td class="feat-name">Empty Canvas Default</td>
+        <td class="feat-desc">Canvas opens blank with the trigger-type gate visible, ready for the admin to start building. Pre-built demo data is only loaded when a template journey is opened (via ?demo=1 URL param). Prevents confusion between a new empty campaign and an existing journey.</td>
+        <td class="feat-ux">window.onload checks URL params. No demo nodes unless ?demo=1. Trigger gate shown immediately. Template journeys open with their pre-built node structure.</td>
+        <td><span class="badge b-built">BUILT</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 2: TRIGGERS
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-trigger)"></div>
+    <span class="section-title" style="color:var(--c-trigger)">Trigger Nodes</span>
+    <span class="section-count">5 features</span>
+    <span class="section-zone">Zone ② Node Palette</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">T-01</td>
+        <td class="feat-name">Real-Time Trigger</td>
+        <td class="feat-desc">Starts a journey when a live player event fires. Reacts the moment the event occurs — login, deposit, bet, game round complete. Mutually exclusive with Schedule Trigger on the same journey.</td>
+        <td class="feat-ux">Entry point node, always first. Deleteable with canvas-reset confirm. Highlighted in green when active.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">T-02</td>
+        <td class="feat-name">Multi-Event Trigger (Branch Fork)</td>
+        <td class="feat-desc">Admin selects up to 3 trigger events simultaneously. Each creates its own independent parallel branch. Journey executes the branch matching the event that fired.
+          <ul class="sub-items">
+            <li>2 events → 2 branches centred on trigger row, BRANCH_GAP=2 apart</li>
+            <li>3 events → 3 branches, middle aligned with trigger, top/bottom offset by 2</li>
+          </ul>
+        </td>
+        <td class="feat-ux">Checkbox selection in trigger config panel. Live branch preview as events are added/removed. Max 3 warning at limit. Branch labels update immediately on canvas.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">T-03</td>
+        <td class="feat-name">Schedule Trigger</td>
+        <td class="feat-desc">Starts a journey at a set date/time or on a repeating interval. Mutually exclusive with Real-Time Trigger. Single-cycle only — no event listening after action.</td>
+        <td class="feat-ux">Calendar date picker + recurrence config. Greyed out if Real-Time is selected.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">T-04</td>
+        <td class="feat-name">Manual Trigger</td>
+        <td class="feat-desc">CRM team initiates the journey manually for a selected audience segment. Used for re-engagement, birthday campaigns, or ad-hoc outreach.</td>
+        <td class="feat-ux">Audience selector + confirm launch button. Shows estimated reach count before confirming.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">T-05</td>
+        <td class="feat-name">Page Move Event</td>
+        <td class="feat-desc">Triggers or reacts when a player navigates to a specific page. Supports multi-select destinations — Web and App pages tracked separately.
+          <ul class="sub-items">
+            <li>Web: Homepage, Cashier, Promo, Games, Account Settings, Support</li>
+            <li>App: Homepage, Cashier, Promo, Games, Profile Screen, Settings</li>
+          </ul>
+        </td>
+        <td class="feat-ux">Checkbox list under event selector. Grouped by Web / App. Selected pages shown as summary chips.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 3: FLOW CONTROL NODES
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-flow)"></div>
+    <span class="section-title" style="color:var(--c-flow)">Flow Control Nodes</span>
+    <span class="section-count">6 features</span>
+    <span class="section-zone">Zone ② Node Palette → Flow</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">F-01</td>
+        <td class="feat-name">Condition Split</td>
+        <td class="feat-desc">Evaluates a player attribute or event condition and routes to Yes or No branch. The primary logic gate in the journey. Uses the full Condition Builder.</td>
+        <td class="feat-ux">Diamond node shape. Yes branch = green, No branch = red. Condition summary shown on node face.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">F-02</td>
+        <td class="feat-name">Event Split</td>
+        <td class="feat-desc">Listens for a specific player event and forks into Yes (event occurred) / No (timed out) branches. Combines Wait and Condition in one node.</td>
+        <td class="feat-ux">Two output ports Yes / No. Timeout setting in config panel. Shows event name on node face.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">F-03</td>
+        <td class="feat-name">Random Split</td>
+        <td class="feat-desc">Divides the player audience randomly across 3 branches (default 33% each). Used for A/B/C testing and controlled experiments within a campaign.</td>
+        <td class="feat-ux">3 output branches labelled with % weight. Weights editable and must sum to 100%.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">F-04</td>
+        <td class="feat-name">Wait Node</td>
+        <td class="feat-desc">Pauses the player's journey for a defined duration before proceeding. Can wait by fixed time or until a specific event occurs.</td>
+        <td class="feat-ux">Clock icon node. Duration selector (minutes/hours/days). Goal event optional override field.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">F-05</td>
+        <td class="feat-name">Pull Data Node</td>
+        <td class="feat-desc">Fetches a specific data attribute for a player at that point in the journey — from real-time sources or historical DWH. Result available for downstream conditions and actions.</td>
+        <td class="feat-ux">Database icon node. Source picker + field selector. Output labelled with field name for downstream use.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">F-06</td>
+        <td class="feat-name">End Node</td>
+        <td class="feat-desc">Terminates the journey for a player who reaches this point. A journey can have multiple End nodes to close different branches cleanly.</td>
+        <td class="feat-ux">Red stop marker. Optional end-state label (e.g. "Converted", "Churned", "Timed Out"). Always available in Flow palette.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 4: CONDITION BUILDER
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-condition)"></div>
+    <span class="section-title" style="color:var(--c-condition)">Condition Builder</span>
+    <span class="section-count">8 features</span>
+    <span class="section-zone">Zone ③ Config Panel</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">CB-01</td>
+        <td class="feat-name">Condition Builder (Core)</td>
+        <td class="feat-desc">Cascading logic builder for defining player eligibility rules. Each condition uses Field → Operator → Value structure. Multiple conditions combined with AND/OR logic.</td>
+        <td class="feat-ux">Inline row-based builder. Add/remove condition rows. AND/OR toggle between rows. Live validation.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CB-02</td>
+        <td class="feat-name">Player Attribute Conditions</td>
+        <td class="feat-desc">Conditions based on stored player profile fields: VIP level, total deposits, account age, country, preferred game category, registration date.</td>
+        <td class="feat-ux">Field dropdown grouped by Attribute / Behaviour / Event. Operator changes based on field type (numeric vs string vs date).</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CB-03</td>
+        <td class="feat-name">Behavioural Conditions</td>
+        <td class="feat-desc">Conditions based on recent player behaviour: days since last login, number of sessions this week, bet frequency, deposit recency.</td>
+        <td class="feat-ux">Time-window selector paired with behaviour metric. e.g. "Last login > 7 days ago".</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CB-04</td>
+        <td class="feat-name">Event-Based Conditions</td>
+        <td class="feat-desc">Conditions that evaluate whether a specific event occurred: has the player deposited, completed a tournament, triggered a specific page visit.</td>
+        <td class="feat-ux">Event picker from catalogue. Count and recency qualifiers. "Has done / Has not done" pattern.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CB-05</td>
+        <td class="feat-name">Tag-Based Conditions</td>
+        <td class="feat-desc">Conditions that check for the presence, absence or value of player tags set earlier in the same journey or from external systems.</td>
+        <td class="feat-ux">Tag name autocomplete from existing tag catalogue. Has/Does Not Have operators. Value match for tagged values.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CB-06</td>
+        <td class="feat-name">Pulled Data Conditions</td>
+        <td class="feat-desc">Conditions that reference data fetched by an upstream Pull Data Node in the same journey. Enables real-time data enrichment to drive routing decisions.</td>
+        <td class="feat-ux">Field reference picker shows available pulled fields from upstream nodes. Clearly labelled with source node name.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CB-07</td>
+        <td class="feat-name">AND / OR Logic Groups</td>
+        <td class="feat-desc">Conditions can be grouped with AND (all must be true) or OR (any must be true) logic. Groups can be nested for complex eligibility rules.</td>
+        <td class="feat-ux">Toggle button between each row changes AND/OR. Visual indent for groups. Plain-language summary shown below builder.</td>
+        <td><span class="badge b-phase2">Phase 2</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CB-08</td>
+        <td class="feat-name">Condition Preview / Plain Language</td>
+        <td class="feat-desc">Live plain-language summary of the condition logic built so far. Helps non-technical admins verify the rule reads as intended before saving.</td>
+        <td class="feat-ux">Auto-generated sentence below builder. Updates in real time. e.g. "Player has deposited in the last 7 days AND VIP level is Gold or above".</td>
+        <td><span class="badge b-phase2">Phase 2</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 5: ACTIVITY NODES
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-activity)"></div>
+    <span class="section-title" style="color:var(--c-activity)">Activity Nodes</span>
+    <span class="section-count">6 features</span>
+    <span class="section-zone">Zone ② Node Palette → Activities</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">A-01</td>
+        <td class="feat-name">Bonus Award</td>
+        <td class="feat-desc">Grants a bonus to the player at that point in the journey. Supports Free Spins, Deposit Match, Cash Bonus, and Loyalty Points. Configurable amount and expiry.</td>
+        <td class="feat-ux">Bonus type picker + amount + expiry hours. Preview of bonus value shown on node face.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">A-02</td>
+        <td class="feat-name">Leaderboard Enrol / Remove</td>
+        <td class="feat-desc">Adds or removes the player from a specified leaderboard at that step. Enables dynamic leaderboard participation triggered by journey logic rather than manual batch enrolment.</td>
+        <td class="feat-ux">Action picker (Add/Remove) + leaderboard name selector from existing catalogue.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">A-03</td>
+        <td class="feat-name">Mission Enrol / Remove</td>
+        <td class="feat-desc">Adds or removes the player from a specific mission. Lets journey logic gate mission access — e.g. only enrol VIP players who deposited this week.</td>
+        <td class="feat-ux">Action picker + mission selector. Mission status shown on node face label.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">A-04</td>
+        <td class="feat-name">Tournament Enrol / Remove</td>
+        <td class="feat-desc">Adds or removes the player from a tournament. Enables conditional tournament enrolment as part of a larger campaign flow.</td>
+        <td class="feat-ux">Action picker + tournament selector. Integration with tournament management system.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">A-05</td>
+        <td class="feat-name">Player Tag Write</td>
+        <td class="feat-desc">Writes or removes a custom data attribute on the player profile at runtime. Tags persist across sessions and are queryable by future journeys or analytics. No engineering changes needed.</td>
+        <td class="feat-ux">Action (Add/Remove) + tag name input + optional tag value. Tag persists across sessions.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">A-06</td>
+        <td class="feat-name">Game Skin Activation</td>
+        <td class="feat-desc">Triggers a personalised game skin or theme for the player's session as part of the journey reward. Enhances the in-session experience contextually.</td>
+        <td class="feat-ux">Skin selector from available catalogue. Preview thumbnail shown. Duration option (session only vs permanent).</td>
+        <td><span class="badge b-phase2">Phase 2</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 6: COMMUNICATIONS
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-comms)"></div>
+    <span class="section-title" style="color:var(--c-comms)">Communication Nodes</span>
+    <span class="section-count">7 features</span>
+    <span class="section-zone">Zone ② Node Palette → Comms</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">CM-01</td>
+        <td class="feat-name">Player Real-Time Message</td>
+        <td class="feat-desc">Sends an in-product message to the player as the journey executes. Appears within the gaming session without interrupting play. Most immediate and contextual message type.</td>
+        <td class="feat-ux">Presentation type picker: Overlay / Big Toast / Small Toast / Pic in Pic / Lobby Banner. Priority selector. Template picker.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CM-02</td>
+        <td class="feat-name">Email</td>
+        <td class="feat-desc">Sends an email to the player. Template-based with dynamic personalisation fields populated from player data. Send timing configurable.</td>
+        <td class="feat-ux">Template selector + subject preview + personalisation token list. Send-time config (immediate or delayed).</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CM-03</td>
+        <td class="feat-name">SMS</td>
+        <td class="feat-desc">Sends a text message to the player's registered mobile number. Short-form, high-urgency channel for time-sensitive offers or alerts.</td>
+        <td class="feat-ux">Template selector + character count indicator. Opt-out compliance check automatic.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CM-04</td>
+        <td class="feat-name">Push Notification</td>
+        <td class="feat-desc">Sends a mobile push to the player's device. Reaches players outside the active session. Supports deep-link routing to specific app pages.</td>
+        <td class="feat-ux">Title + body fields. Deep-link destination picker. Preview of push on mock device.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CM-05</td>
+        <td class="feat-name">WhatsApp</td>
+        <td class="feat-desc">Sends a WhatsApp message to the player using pre-approved template messages per platform compliance. High open-rate channel for key engagement moments.</td>
+        <td class="feat-ux">Approved template picker only. Opt-in status check before node accepts placement.</td>
+        <td><span class="badge b-phase2">Phase 2</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CM-06</td>
+        <td class="feat-name">Slack (Internal Alert)</td>
+        <td class="feat-desc">Sends an internal Slack notification to a business owner or team channel — not to the player. Used for operational alerts: VIP issues, offer refusal spikes, deposit failures.</td>
+        <td class="feat-ux">Channel selector + message template + trigger condition summary. Clearly marked "Internal" with team icon.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">CM-07</td>
+        <td class="feat-name">Communication Priority Matrix</td>
+        <td class="feat-desc">Defines which presentation format takes priority when multiple messages compete for the player's attention simultaneously.
+          <ul class="sub-items">
+            <li>Sales (P1): Overlay → Big Toast → Lobby Banner</li>
+            <li>Compliance (P1): Big Toast → Small Toast → Inbox</li>
+            <li>Campaign Update (P2): Small Toast → Pic in Pic → Inbox</li>
+            <li>Follow-up (P3): Overlay → Small Toast → Lobby Banner</li>
+          </ul>
+        </td>
+        <td class="feat-ux">Priority selector per comms node. Conflict warning if two high-priority nodes could fire simultaneously.</td>
+        <td><span class="badge b-phase2">Phase 2</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 7: PLAYER DATA NODES
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-data)"></div>
+    <span class="section-title" style="color:var(--c-data)">Player Data Nodes</span>
+    <span class="section-count">2 features</span>
+    <span class="section-zone">Zone ② Node Palette → Player Data</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">PD-01</td>
+        <td class="feat-name">Add / Remove Player Tag</td>
+        <td class="feat-desc">Writes or removes a custom data attribute on a player profile at that point in the journey. Tags created here are available as conditions in downstream nodes or future journeys.</td>
+        <td class="feat-ux">Action (Add/Remove) + tag name input + optional value. Tag persists across sessions.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">PD-02</td>
+        <td class="feat-name">Pull Data Node</td>
+        <td class="feat-desc">Fetches a player data attribute at runtime — from real-time event stream or historical DWH. Makes the value available for conditions and personalisation in downstream nodes.</td>
+        <td class="feat-ux">Source picker (Real-time / Historical) + field selector. Output port labelled with field name.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 8: MONITORING & REPORTING
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-monitor)"></div>
+    <span class="section-title" style="color:var(--c-monitor)">Monitoring & Reporting</span>
+    <span class="section-count">4 features</span>
+    <span class="section-zone">Zone ⑤ Monitoring Bar</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Feature</th><th>Description</th><th>UX Behaviour</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="feat-id">M-01</td>
+        <td class="feat-name">Live Heat Map</td>
+        <td class="feat-desc">Overlays real-time player counts on each canvas node — showing exactly how many players are at each step of the journey at any moment.</td>
+        <td class="feat-ux">Number badge on each node. Colour intensity scales with volume. Toggle heat map on/off in toolbar.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">M-02</td>
+        <td class="feat-name">Campaign Reporting</td>
+        <td class="feat-desc">Detailed analytics: player counts per node, conversion rates per branch, time-in-step distribution, projected LTV impact.</td>
+        <td class="feat-ux">Side drawer or dedicated report view. Per-node drill-down. Exportable.</td>
+        <td><span class="badge b-phase2">Phase 2</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">M-03</td>
+        <td class="feat-name">Internal Alerts (Slack)</td>
+        <td class="feat-desc">Automated Slack notifications when campaign anomalies are detected — VIP deposit failures, high offer refusal rates, system errors mid-journey.</td>
+        <td class="feat-ux">Alert config in Slack node. Threshold setter (e.g. >20% refusal rate). Alert log in monitoring bar.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr>
+        <td class="feat-id">M-04</td>
+        <td class="feat-name">Import / Export Journey</td>
+        <td class="feat-desc">Saves the full journey definition as a JSON file and allows re-importing it. Enables cross-environment migration, templates and version archiving.</td>
+        <td class="feat-ux">Export button → downloads JSON. Import → file picker, canvas reloads with imported journey. Versioned filename with timestamp.</td>
+        <td><span class="badge b-mvp">MVP</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     DIVIDER: SUPPORTING DEVELOPMENTS
+══════════════════════════════════════════ -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-label">Supporting Infrastructure & Platform Development</div>
+  <div class="divider-line"></div>
+</div>
+
+<p style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:24px;line-height:1.7;max-width:760px">
+  The items below are engineering and infrastructure work required to support the Olives Builder in production. These are platform-level developments — not features within the builder UI itself — but are required for the builder to function in a live environment.
+</p>
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 9: SUPPORTING DEVELOPMENTS
+══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-color" style="background:var(--c-support)"></div>
+    <span class="section-title" style="color:var(--c-support)">Supporting Infrastructure</span>
+    <span class="section-count">9 items</span>
+    <span class="section-zone">Platform Engineering</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Item</th><th>Description</th><th>Dependencies / Notes</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr class="support-row">
+        <td class="feat-id">INF-01</td>
+        <td class="feat-name">Kafka Broker Setup</td>
+        <td class="feat-desc">Build and configure a Kafka message broker with the topics required to stream real-time player events into the journey engine. Topics needed: player.events (login, deposit, bet, game-round), player.page-views, player.session, system.alerts.</td>
+        <td class="feat-ux">Required by: Real-Time Trigger (T-01), Event Split (F-02), Pull Data Node (F-05, PD-02). Must support consumer groups per journey instance. Retention: 7 days minimum.</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr class="support-row">
+        <td class="feat-id">INF-02</td>
+        <td class="feat-name">Player Data API</td>
+        <td class="feat-desc">Build an internal REST/GraphQL API that the journey engine calls to pull player profile data, behavioural history and segment membership at runtime. Must support low-latency reads for in-journey use.</td>
+        <td class="feat-ux">Required by: Pull Data Node (F-05, PD-02), Condition Builder player attributes (CB-02, CB-03). Target SLA: &lt;100ms p99. Endpoints: /player/{id}/profile, /player/{id}/events, /player/{id}/tags.</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr class="support-row">
+        <td class="feat-id">INF-03</td>
+        <td class="feat-name">Journey Execution Engine</td>
+        <td class="feat-desc">Server-side engine that reads the journey graph (exported JSON), subscribes to relevant Kafka topics, and executes node logic per player in real time. Stateful — tracks each player's current position in the journey.</td>
+        <td class="feat-ux">Required by all journey features. Must handle concurrent player instances per journey. State stored per player per journey. Supports pause/resume of individual journeys.</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr class="support-row">
+        <td class="feat-id">INF-04</td>
+        <td class="feat-name">Journey Persistence API</td>
+        <td class="feat-desc">API layer for saving, loading, versioning and publishing journey definitions. Stores the full node/edge graph and campaign metadata. Supports draft, active, paused and completed states.</td>
+        <td class="feat-ux">Required by: Campaign Manager homepage (CS-01), Import/Export (M-04), Canvas save. Endpoints: POST /journeys, GET /journeys/{id}, PUT /journeys/{id}/publish, GET /journeys (list). Versioned — keeps history of published states.</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr class="support-row">
+        <td class="feat-id">INF-05</td>
+        <td class="feat-name">Bonus Issuance Integration</td>
+        <td class="feat-desc">Integration with the bonus management system to issue Free Spins, Deposit Match, Cash Bonus and Loyalty Points from within a journey. Journey engine calls the bonus API when a Bonus Award node executes.</td>
+        <td class="feat-ux">Required by: Bonus Award node (A-01). Must handle duplicate-issue prevention. Callback/webhook when bonus is accepted or declined by the player (feeds into Event Split logic).</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr class="support-row">
+        <td class="feat-id">INF-06</td>
+        <td class="feat-name">Communications Dispatch Service</td>
+        <td class="feat-desc">Unified service that receives send-message instructions from the journey engine and dispatches them to the correct channel provider — ESP (email), SMS gateway, push notification service, in-product message bus, or Slack webhook.</td>
+        <td class="feat-ux">Required by: All comms nodes (CM-01 to CM-06). Must handle channel opt-out checks, rate limiting, and deduplication within a session. Delivery receipts fed back to journey engine for event-based wait nodes.</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr class="support-row">
+        <td class="feat-id">INF-07</td>
+        <td class="feat-name">Player Tag Write API</td>
+        <td class="feat-desc">API endpoint that the journey engine calls to write, update or remove custom player tags on the player profile in real time. Tags must be immediately queryable by downstream journey conditions.</td>
+        <td class="feat-ux">Required by: Player Tag Write node (A-05, PD-01). Endpoint: PUT /player/{id}/tags. Must be synchronous — condition evaluation happens in the same execution tick. Tag namespace per tenant.</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-mvp">MVP</span></td>
+      </tr>
+      <tr class="support-row">
+        <td class="feat-id">INF-08</td>
+        <td class="feat-name">Leaderboard / Mission / Tournament API</td>
+        <td class="feat-desc">Integration APIs connecting the journey engine to the gamification management systems. Enables enrol/remove operations on leaderboards, missions and tournaments from within a journey execution.</td>
+        <td class="feat-ux">Required by: Activity nodes A-02, A-03, A-04. Three separate integration points — each with enrol and remove endpoints. Must return confirmation of enrolment for use by downstream conditions.</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-phase2">Phase 2</span></td>
+      </tr>
+      <tr class="support-row">
+        <td class="feat-id">INF-09</td>
+        <td class="feat-name">Analytics & Metrics Pipeline</td>
+        <td class="feat-desc">Data pipeline that collects per-node player counts, conversion events, and time-in-step metrics from the journey execution engine and makes them available for the live heat map and campaign reporting features.</td>
+        <td class="feat-ux">Required by: Live Heat Map (M-01), Campaign Reporting (M-02). Real-time stream to live heat map (WebSocket or polling). Batch aggregation to reporting database. Retention: 90 days per campaign.</td>
+        <td><span class="badge b-infra">INFRA</span> <span class="badge b-phase2">Phase 2</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
