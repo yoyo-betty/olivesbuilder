@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olives — New Campaign</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e1017;
+  --surface:#161921;
+  --surface2:#1c2030;
+  --surface3:#222638;
+  --border:#252a3a;
+  --border2:#2e3448;
+  --border3:#3a4060;
+  --text:#e2e6f0;
+  --text2:#8892aa;
+  --text3:#4a5270;
+  --accent:#4ade80;
+  --accent2:#22c55e;
+  --accent-dim:rgba(74,222,128,0.08);
+  --accent-glow:rgba(34,197,94,0.2);
+  --red:#f87171;
+  --red-dim:rgba(248,113,113,0.08);
+  --blue:#60a5fa;
+  --amber:#f59e0b;
+}
+
+html,body{
+  height:100%;
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow:hidden;
+}
+
+/* ── GRID BACKGROUND ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,0.028) 1px, transparent 0);
+  background-size:28px 28px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:52px;
+  background:rgba(22,25,33,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 28px;gap:0;
+  z-index:100;
+}
+.logo{display:flex;align-items:center;gap:8px;margin-right:24px}
+.logo-mark{
+  width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;
+  box-shadow:0 0 12px rgba(34,197,94,0.3);
+}
+.logo-text{font-size:14px;font-weight:600;color:var(--text)}
+.vsep{width:1px;height:26px;background:var(--border);margin:0 16px}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)}
+.breadcrumb-item{color:var(--text2)}
+.breadcrumb-item.active{color:var(--text)}
+.breadcrumb-sep{color:var(--text3)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 16px;border-radius:7px;
+  font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;
+  cursor:pointer;border:1px solid transparent;
+  transition:all 0.15s;white-space:nowrap;
+}
+.btn-ghost{background:transparent;border-color:var(--border2);color:var(--text2)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-primary{
+  background:var(--accent2);border-color:var(--accent2);color:#fff;
+  box-shadow:0 0 16px rgba(34,197,94,0.22);
+}
+.btn-primary:hover{background:#16a34a;box-shadow:0 0 22px rgba(34,197,94,0.35)}
+.btn-primary:disabled{background:var(--surface3);border-color:var(--border2);color:var(--text3);box-shadow:none;cursor:not-allowed}
+
+/* ── MAIN LAYOUT ── */
+.shell{
+  position:fixed;inset:0;top:52px;
+  display:flex;
+  overflow:hidden;
+}
+
+/* ── SIDEBAR PROGRESS ── */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:36px 24px;
+  display:flex;flex-direction:column;
+  gap:0;
+}
+.sidebar-heading{
+  font-size:10px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--text3);
+  margin-bottom:28px;
+}
+.step-list{display:flex;flex-direction:column;gap:0}
+.step-item{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 0;position:relative;cursor:pointer;
+}
+.step-item:not(:last-child)::after{
+  content:'';position:absolute;
+  left:15px;top:44px;
+  width:2px;height:calc(100% - 16px);
+  background:var(--border2);
+}
+.step-item.done:not(:last-child)::after{background:var(--accent2)}
+.step-dot{
+  width:30px;height:30px;flex-shrink:0;
+  border-radius:50%;
+  border:2px solid var(--border2);
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--text3);
+  position:relative;z-index:1;
+  transition:all 0.25s;
+}
+.step-item.active .step-dot{
+  border-color:var(--accent);
+  background:rgba(74,222,128,0.1);
+  color:var(--accent);
+  box-shadow:0 0 0 4px rgba(74,222,128,0.08);
+}
+.step-item.done .step-dot{
+  border-color:var(--accent2);
+  background:var(--accent2);
+  color:#fff;
+}
+.step-text{padding-top:5px}
+.step-title{font-size:13px;font-weight:600;color:var(--text3);transition:color 0.2s}
+.step-sub{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4}
+.step-item.active .step-title{color:var(--text)}
+.step-item.done .step-title{color:var(--text2)}
+
+.sidebar-footer{
+  margin-top:auto;
+  padding:16px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+.sf-label{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.sf-val{font-size:13px;font-weight:600;color:var(--text2);font-family:'IBM Plex Mono',monospace}
+.progress-bar{height:3px;background:var(--border2);border-radius:2px;margin-top:12px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;transition:width 0.4s ease}
+
+/* ── CONTENT AREA ── */
+.content{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:48px 60px;
+  scroll-behavior:smooth;
+}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── PAGE SCREENS ── */
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:48px}
+.page-eyebrow{
+  font-size:10px;font-weight:700;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.page-eyebrow::before{content:'';width:20px;height:2px;background:var(--accent);border-radius:1px}
+.page-title{font-size:28px;font-weight:800;color:var(--text);line-height:1.2;margin-bottom:10px;letter-spacing:-0.02em}
+.page-desc{font-size:14px;color:var(--text2);line-height:1.6;max-width:560px}
+
+/* ── FORM SECTIONS ── */
+.form-section{margin-bottom:40px}
+.section-label{
+  font-size:10px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--text3);
+  margin-bottom:20px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+
+/* ── FIELD GROUPS ── */
+.field-row{display:grid;gap:20px;margin-bottom:20px}
+.field-row.cols-2{grid-template-columns:1fr 1fr}
+.field-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+.field-row.cols-1{grid-template-columns:1fr}
+
+.field-group{display:flex;flex-direction:column;gap:8px}
+.field-label{
+  font-size:12px;font-weight:600;color:var(--text2);
+  display:flex;align-items:center;gap:8px;
+}
+.field-label .required{color:var(--accent);font-size:10px}
+.field-hint{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5}
+.char-count{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text3);margin-left:auto}
+.char-count.warn{color:var(--amber)}
+.char-count.over{color:var(--red)}
+
+/* ── INPUTS ── */
+.field-input{
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:9px;
+  padding:11px 14px;
+  font-size:13px;
+  font-family:'Outfit',sans-serif;
+  color:var(--text);
+  outline:none;
+  transition:all 0.18s;
+  width:100%;
+}
+.field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,222,128,0.08)}
+.field-input::placeholder{color:var(--text3)}
+.field-input:disabled{opacity:0.4;cursor:not-allowed}
+
+textarea.field-input{resize:vertical;min-height:120px;line-height:1.6}
+
+/* ── SELECT ── */
+.field-select{
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:9px;
+  padding:11px 14px;
+  font-size:13px;
+  font-family:'Outfit',sans-serif;
+  color:var(--text);
+  outline:none;
+  transition:all 0.18s;
+  width:100%;
+  cursor:pointer;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5270' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:38px;
+}
+.field-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,222,128,0.08)}
+.field-select option{background:var(--surface2)}
+
+/* ── TOGGLE PILL (Yes/No) ── */
+.toggle-pill{
+  display:inline-flex;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:9px;
+  padding:3px;
+  gap:2px;
+}
+.toggle-pill-btn{
+  padding:8px 20px;border-radius:7px;
+  font-size:12px;font-weight:600;
+  font-family:'Outfit',sans-serif;
+  border:none;cursor:pointer;
+  color:var(--text3);background:transparent;
+  transition:all 0.18s;
+}
+.toggle-pill-btn.active{
+  background:var(--surface3);
+  color:var(--text);
+  box-shadow:0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle-pill-btn.active.yes{background:rgba(74,222,128,0.12);color:var(--accent)}
+.toggle-pill-btn.active.no{background:rgba(248,113,113,0.1);color:var(--red)}
+
+/* ── SEGMENT CONTROL (multi-option pill) ── */
+.segment-control{
+  display:inline-flex;flex-wrap:wrap;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:9px;
+  padding:3px;gap:2px;
+}
+.seg-btn{
+  padding:8px 16px;border-radius:7px;
+  font-size:12px;font-weight:600;
+  font-family:'Outfit',sans-serif;
+  border:none;cursor:pointer;
+  color:var(--text3);background:transparent;
+  transition:all 0.18s;white-space:nowrap;
+}
+.seg-btn.active{
+  background:var(--surface3);color:var(--text);
+  box-shadow:0 1px 4px rgba(0,0,0,0.3);
+}
+.seg-btn.active.green{background:rgba(74,222,128,0.12);color:var(--accent)}
+
+/* ── DATE ROW ── */
+.date-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.date-row .field-input[type=date]{flex:1;min-width:160px}
+.date-sep{font-size:12px;color:var(--text3);flex-shrink:0}
+
+/* ── ONGOING TOGGLE ── */
+.ongoing-toggle{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:9px;cursor:pointer;user-select:none;
+  transition:all 0.15s;flex-shrink:0;
+}
+.ongoing-toggle:hover{border-color:var(--border3)}
+.ongoing-toggle.active{border-color:var(--accent);background:var(--accent-dim)}
+.ot-switch{
+  width:32px;height:18px;border-radius:9px;
+  background:var(--surface3);position:relative;
+  transition:background 0.2s;flex-shrink:0;
+}
+.ongoing-toggle.active .ot-switch{background:var(--accent2)}
+.ot-switch::after{
+  content:'';position:absolute;
+  top:3px;left:3px;
+  width:12px;height:12px;border-radius:50%;
+  background:#fff;transition:left 0.2s;
+}
+.ongoing-toggle.active .ot-switch::after{left:17px}
+.ot-label{font-size:12px;font-weight:600;color:var(--text2)}
+.ongoing-toggle.active .ot-label{color:var(--accent)}
+
+/* ── CARD BLOCK (rule card) ── */
+.rule-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:24px;
+  margin-bottom:16px;
+  transition:border-color 0.2s;
+}
+.rule-card:hover{border-color:var(--border2)}
+.rule-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:0;
+}
+.rule-card-title{
+  font-size:14px;font-weight:700;color:var(--text);
+  display:flex;align-items:center;gap:10px;
+}
+.rule-card-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
+}
+.rule-card-desc{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.5}
+.rule-card-body{margin-top:20px;padding-top:20px;border-top:1px solid var(--border);display:none}
+.rule-card-body.open{display:block}
+
+/* ── NUMBER INPUT WITH LABEL ── */
+.num-input-wrap{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:9px;overflow:hidden;
+  transition:border-color 0.18s;
+}
+.num-input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,222,128,0.08)}
+.num-input-wrap input{
+  background:transparent;border:none;outline:none;
+  padding:11px 14px;font-size:13px;font-family:'Outfit',sans-serif;
+  color:var(--text);width:100%;
+}
+.num-input-wrap input::placeholder{color:var(--text3)}
+.num-input-suffix{
+  padding:0 14px;font-size:12px;font-weight:600;
+  color:var(--text3);white-space:nowrap;
+  border-left:1px solid var(--border);
+  height:100%;display:flex;align-items:center;
+  background:var(--surface3);
+  min-height:42px;
+}
+
+/* ── DAY PICKER ── */
+.day-picker{display:flex;gap:6px;flex-wrap:wrap}
+.day-btn{
+  width:44px;height:44px;border-radius:9px;
+  font-size:11px;font-weight:700;
+  border:1px solid var(--border2);
+  background:var(--surface2);
+  color:var(--text3);cursor:pointer;
+  transition:all 0.15s;
+  font-family:'Outfit',sans-serif;
+}
+.day-btn:hover{border-color:var(--border3);color:var(--text2)}
+.day-btn.active{
+  border-color:var(--accent);
+  background:rgba(74,222,128,0.1);
+  color:var(--accent);
+}
+
+/* ── INTERVAL PRESETS ── */
+.interval-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.preset-btn{
+  padding:7px 14px;border-radius:7px;
+  font-size:11px;font-weight:600;
+  border:1px solid var(--border2);
+  background:var(--surface2);color:var(--text3);
+  cursor:pointer;transition:all 0.15s;
+  font-family:'Outfit',sans-serif;
+}
+.preset-btn:hover{border-color:var(--border3);color:var(--text2)}
+.preset-btn.active{
+  border-color:var(--blue);
+  background:rgba(96,165,250,0.08);
+  color:var(--blue);
+}
+
+/* ── INLINE NOTICE ── */
+.notice{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:12px 14px;border-radius:9px;
+  background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);
+  font-size:12px;color:#fbbf24;line-height:1.5;margin-top:12px;
+}
+.notice.green{
+  background:rgba(74,222,128,0.06);border-color:rgba(74,222,128,0.15);
+  color:var(--accent);
+}
+
+/* ── FORM FOOTER ── */
+.form-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:52px;padding-top:28px;
+  border-top:1px solid var(--border);
+}
+.footer-left{font-size:12px;color:var(--text3)}
+
+/* ── ANIMATIONS ── */
+@keyframes slideIn{
+  from{opacity:0;transform:translateX(18px)}
+  to{opacity:1;transform:translateX(0)}
+}
+.screen.active{animation:slideIn 0.28s ease}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.rule-card-body.open{animation:fadeUp 0.2s ease}
+
+/* input[type=date] calendar icon */
+input[type=date]::-webkit-calendar-picker-indicator{
+  filter:invert(0.4) sepia(1) hue-rotate(180deg);
+  cursor:pointer;opacity:0.6;
+}
+input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark">🫒</div>
+    <div class="logo-text">Olives Builder</div>
+  </div>
+  <div class="vsep"></div>
+  <div class="breadcrumb">
+    <span class="breadcrumb-item">Campaigns</span>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-item active" id="breadcrumbPage">New Campaign</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-ghost" onclick="cancelSetup()">Cancel</button>
+    <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+      Continue <span style="margin-left:2px">→</span>
+    </button>
+  </div>
+</header>
+
+<!-- SHELL -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-heading">Setup Steps</div>
+    <div class="step-list">
+
+      <div class="step-item active" id="step1" onclick="goToStep(1)">
+        <div class="step-dot" id="dot1">1</div>
+        <div class="step-text">
+          <div class="step-title">Campaign Info</div>
+          <div class="step-sub">Name, category & timeframe</div>
+        </div>
+      </div>
+
+      <div class="step-item" id="step2" onclick="goToStep(2)">
+        <div class="step-dot" id="dot2">2</div>
+        <div class="step-text">
+          <div class="step-title">Participation Rules</div>
+          <div class="step-sub">Entry, re-entry & scheduling</div>
+        </div>
+      </div>
+
+      <div class="step-item" id="step3" onclick="goToStep(3)">
+        <div class="step-dot" id="dot3">3</div>
+        <div class="step-text">
+          <div class="step-title">Build Journey</div>
+          <div class="step-sub">Canvas — nodes & logic</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sf-label">Completion</div>
+      <div class="sf-val" id="progressLabel">Step 1 of 2</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+
+    <!-- ══ SCREEN 1: CAMPAIGN INFORMATION ══ -->
+    <div class="screen active" id="screen1">
+
+      <div class="page-header">
+        <div class="page-eyebrow">Step 1</div>
+        <div class="page-title">Campaign Information</div>
+        <div class="page-desc">Define the core identity of your campaign — its name, purpose and time boundaries.</div>
+      </div>
+
+      <!-- Campaign Name -->
+      <div class="form-section">
+        <div class="section-label">Identity</div>
+
+        <div class="field-row cols-1">
+          <div class="field-group">
+            <div class="field-label">
+              Campaign Name <span class="required">required</span>
+              <span class="char-count" id="nameCount">0 / 250</span>
+            </div>
+            <input
+              class="field-input"
+              type="text"
+              id="campaignName"
+              maxlength="250"
+              placeholder="e.g. Summer Re-engagement Q3 2025"
+              oninput="countChars('campaignName','nameCount',250)"
+              autocomplete="off"
+            />
+            <div class="field-hint">A clear, descriptive name helps your team identify this campaign at a glance.</div>
+          </div>
+        </div>
+
+        <div class="field-row cols-2">
+          <div class="field-group">
+            <div class="field-label">Campaign Category <span class="required">required</span></div>
+            <select class="field-select" id="campaignCategory">
+              <option value="" disabled selected>Select a category…</option>
+              <option value="acquisition">Acquisition — attract new players</option>
+              <option value="conversion">Conversion — turn prospects into depositors</option>
+              <option value="retention">Retention — keep active players engaged</option>
+              <option value="reactivation">Reactivation — bring back lapsed players</option>
+              <option value="general">General — no specific funnel stage</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Demo Campaign?</div>
+            <div style="margin-top:2px">
+              <div class="toggle-pill">
+                <button class="toggle-pill-btn active no" id="demoNo" onclick="setDemo(false)">No — Live</button>
+                <button class="toggle-pill-btn" id="demoYes" onclick="setDemo(true)">Yes — Demo</button>
+              </div>
+            </div>
+            <div class="field-hint" id="demoHint">This campaign will run against live player data.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeframe -->
+      <div class="form-section">
+        <div class="section-label">Timeframe</div>
+
+        <div class="field-row cols-1">
+          <div class="field-group">
+            <div class="field-label">Campaign Duration</div>
+
+            <div class="date-row" id="dateRow">
+              <div style="flex:1;min-width:160px">
+                <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:600">START DATE</div>
+                <input class="field-input" type="date" id="startDate" />
+              </div>
+              <div class="date-sep" id="dateSep">→</div>
+              <div style="flex:1;min-width:160px" id="endDateWrap">
+                <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:600">END DATE</div>
+                <input class="field-input" type="date" id="endDate" />
+              </div>
+              <div style="display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:0">
+                <div style="font-size:11px;color:transparent;margin-bottom:6px;font-weight:600">OR</div>
+                <div class="ongoing-toggle" id="ongoingToggle" onclick="toggleOngoing()">
+                  <div class="ot-switch"></div>
+                  <span class="ot-label">Ongoing</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-hint" id="dateHint">Campaign will run from the start date until the end date.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="form-section">
+        <div class="section-label">Notes</div>
+        <div class="field-row cols-1">
+          <div class="field-group">
+            <div class="field-label">
+              Campaign Notes
+              <span class="char-count" id="commentCount">0 / 1000 words</span>
+            </div>
+            <textarea
+              class="field-input"
+              id="campaignComments"
+              rows="6"
+              placeholder="Add context, objectives, or any notes for your team about this campaign…"
+              oninput="countWords('campaignComments','commentCount',1000)"
+            ></textarea>
+            <div class="field-hint">Describe the campaign goal, target audience, or any special rules your team should know.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <div class="footer-left">All fields marked <span style="color:var(--accent)">required</span> must be filled to continue.</div>
+        <button class="btn btn-primary" onclick="nextStep()">Continue to Participation Rules →</button>
+      </div>
+
+    </div><!-- /screen1 -->
+
+
+    <!-- ══ SCREEN 2: PARTICIPATION SETUP ══ -->
+    <div class="screen" id="screen2">
+
+      <div class="page-header">
+        <div class="page-eyebrow">Step 2</div>
+        <div class="page-title">Participation Rules</div>
+        <div class="page-desc">Control who can enter, how many times, and when the campaign accepts participants.</div>
+      </div>
+
+      <!-- Entry Type -->
+      <div class="form-section">
+        <div class="section-label">Entry Mode</div>
+
+        <div class="rule-card" id="entryCard">
+          <div class="rule-card-header">
+            <div>
+              <div class="rule-card-title">
+                <div class="rule-card-icon" style="background:rgba(74,222,128,0.1)">🚪</div>
+                Entry Type
+              </div>
+              <div class="rule-card-desc">Choose whether a player can enter this campaign once or multiple times.</div>
+            </div>
+            <div class="segment-control">
+              <button class="seg-btn active green" id="entrySingle" onclick="setEntry('single')">Single Entry</button>
+              <button class="seg-btn" id="entryMulti" onclick="setEntry('multi')">Multi Entry</button>
+            </div>
+          </div>
+
+          <div class="rule-card-body" id="entryBody">
+            <div class="field-row cols-2">
+              <div class="field-group">
+                <div class="field-label">Participant Cap</div>
+                <div class="num-input-wrap">
+                  <input type="number" id="entryCap" placeholder="No cap" min="1" />
+                  <div class="num-input-suffix">players max</div>
+                </div>
+                <div class="field-hint">Leave empty for unlimited. Once reached, no new players can enter.</div>
+              </div>
+            </div>
+            <div class="notice">
+              ⚠ When the cap is reached the journey will stop accepting new entries. Existing participants continue unaffected.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Re-entry -->
+      <div class="form-section">
+        <div class="section-label">Re-entry</div>
+
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div>
+              <div class="rule-card-title">
+                <div class="rule-card-icon" style="background:rgba(96,165,250,0.1)">🔄</div>
+                Allow Re-entry
+              </div>
+              <div class="rule-card-desc">Can a player who completed or exited the journey re-enter it again?</div>
+            </div>
+            <div class="toggle-pill">
+              <button class="toggle-pill-btn active no" id="reentryNo" onclick="setReentry(false)">No</button>
+              <button class="toggle-pill-btn" id="reentryYes" onclick="setReentry(true)">Yes</button>
+            </div>
+          </div>
+
+          <div class="rule-card-body" id="reentryBody">
+            <div class="field-row cols-2">
+              <div class="field-group">
+                <div class="field-label">Max Re-entries per Player</div>
+                <div class="num-input-wrap">
+                  <input type="number" id="reentryMax" placeholder="Unlimited" min="1" />
+                  <div class="num-input-suffix">times</div>
+                </div>
+                <div class="field-hint">Leave empty to allow unlimited re-entries. Set a number to cap how many times one player can re-enter.</div>
+              </div>
+            </div>
+            <div class="notice green">
+              ✓ Re-entry lets the same player experience the campaign multiple times — useful for weekly bonuses or recurring missions.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Campaign Interval -->
+      <div class="form-section">
+        <div class="section-label">Campaign Interval</div>
+
+        <div class="rule-card">
+          <div class="rule-card-header">
+            <div>
+              <div class="rule-card-title">
+                <div class="rule-card-icon" style="background:rgba(245,158,11,0.1)">📅</div>
+                Active Window
+              </div>
+              <div class="rule-card-desc">When is this campaign open to new participant entries?</div>
+            </div>
+            <div class="segment-control">
+              <button class="seg-btn active green" id="intAlways" onclick="setInterval('always')">Always Active</button>
+              <button class="seg-btn" id="intScheduled" onclick="setInterval('scheduled')">Scheduled Days</button>
+            </div>
+          </div>
+
+          <div class="rule-card-body" id="intervalBody">
+
+            <div style="margin-bottom:20px">
+              <div class="field-label" style="margin-bottom:12px">Active Days of the Week</div>
+              <div class="day-picker" id="dayPicker">
+                <button class="day-btn" data-day="Mon" onclick="toggleDay(this)">Mon</button>
+                <button class="day-btn" data-day="Tue" onclick="toggleDay(this)">Tue</button>
+                <button class="day-btn" data-day="Wed" onclick="toggleDay(this)">Wed</button>
+                <button class="day-btn" data-day="Thu" onclick="toggleDay(this)">Thu</button>
+                <button class="day-btn" data-day="Fri" onclick="toggleDay(this)">Fri</button>
+                <button class="day-btn" data-day="Sat" onclick="toggleDay(this)">Sat</button>
+                <button class="day-btn" data-day="Sun" onclick="toggleDay(this)">Sun</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="field-label" style="margin-bottom:8px">Quick Presets</div>
+              <div class="interval-presets">
+                <button class="preset-btn" onclick="applyPreset('weekdays')">Weekdays only</button>
+                <button class="preset-btn" onclick="applyPreset('weekends')">Weekends only</button>
+                <button class="preset-btn" onclick="applyPreset('all')">Every day</button>
+              </div>
+            </div>
+
+            <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+              <div class="field-label" style="margin-bottom:8px">Entry Cooldown — player must wait between entries</div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <div class="segment-control">
+                  <button class="seg-btn" id="coolNone" onclick="setCooldown('none')">No cooldown</button>
+                  <button class="seg-btn" id="cool1d" onclick="setCooldown('1d')">1 Day</button>
+                  <button class="seg-btn active green" id="cool1w" onclick="setCooldown('1w')">1 Week</button>
+                  <button class="seg-btn" id="cool1m" onclick="setCooldown('1m')">1 Month</button>
+                  <button class="seg-btn" id="coolCustom" onclick="setCooldown('custom')">Custom</button>
+                </div>
+                <div id="coolCustomWrap" style="display:none">
+                  <div class="num-input-wrap" style="width:180px">
+                    <input type="number" placeholder="e.g. 3" min="1" id="coolCustomVal" />
+                    <div class="num-input-suffix">
+                      <select style="background:transparent;border:none;outline:none;color:var(--text3);font-family:Outfit,sans-serif;font-size:12px;cursor:pointer">
+                        <option>days</option>
+                        <option>weeks</option>
+                        <option>months</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="field-hint" style="margin-top:8px">After each entry, a player must wait this long before they can enter again.</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="form-footer">
+        <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="launchCanvas()">Launch Canvas Builder →</button>
+      </div>
+
+    </div><!-- /screen2 -->
+
+  </div><!-- /content -->
+</div><!-- /shell -->
+
+<script>
+// ── STATE ──
+let currentStep = 1;
+let isOngoing = false;
+let isDemo = false;
+let entryType = 'single';
+let reentryAllowed = false;
+let intervalType = 'always';
+let cooldown = '1w';
+let activeDays = new Set();
+
+// ── NAVIGATION ──
+function goToStep(n) {
+  if (n > currentStep) return; // can only go back
+  currentStep = n;
+  updateUI();
+}
+
+function nextStep() {
+  if (currentStep === 1) {
+    if (!validateScreen1()) return;
+    currentStep = 2;
+    updateUI();
+    document.getElementById('content').scrollTop = 0;
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    currentStep--;
+    updateUI();
+    document.getElementById('content').scrollTop = 0;
+  }
+}
+
+function updateUI() {
+  // Screens
+  document.querySelectorAll('.screen').forEach((s, i) => {
+    s.classList.toggle('active', i + 1 === currentStep);
+  });
+
+  // Sidebar steps
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step' + i);
+    const dot = document.getElementById('dot' + i);
+    el.classList.remove('active', 'done');
+    if (i < currentStep) { el.classList.add('done'); dot.textContent = '✓'; }
+    else if (i === currentStep) { el.classList.add('active'); dot.textContent = i; }
+    else { dot.textContent = i; }
+  }
+
+  // Progress
+  const pct = Math.round(((currentStep - 1) / 2) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Step ${Math.min(currentStep, 2)} of 2`;
+
+  // Breadcrumb
+  const labels = ['Campaign Info', 'Participation Rules', 'Journey Canvas'];
+  document.getElementById('breadcrumbPage').textContent = labels[currentStep - 1] || 'New Campaign';
+
+  // Next button label
+  const nextBtn = document.getElementById('nextBtn');
+  if (currentStep === 1) {
+    nextBtn.innerHTML = 'Continue <span style="margin-left:2px">→</span>';
+    nextBtn.style.display = '';
+  } else {
+    nextBtn.style.display = 'none';
+  }
+}
+
+// ── VALIDATION ──
+function validateScreen1() {
+  const name = document.getElementById('campaignName').value.trim();
+  const cat  = document.getElementById('campaignCategory').value;
+
+  if (!name) {
+    highlight('campaignName'); showError('Please enter a campaign name.'); return false;
+  }
+  if (!cat) {
+    highlight('campaignCategory'); showError('Please select a campaign category.'); return false;
+  }
+  return true;
+}
+
+function highlight(id) {
+  const el = document.getElementById(id);
+  el.style.borderColor = 'var(--red)';
+  el.style.boxShadow = '0 0 0 3px rgba(248,113,113,0.1)';
+  el.focus();
+  setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 2000);
+}
+
+function showError(msg) {
+  // Simple inline error — could be upgraded to toast
+  alert(msg); // placeholder; in real app replace with toast
+}
+
+// ── CHARACTER / WORD COUNT ──
+function countChars(inputId, countId, max) {
+  const el = document.getElementById(inputId);
+  const countEl = document.getElementById(countId);
+  const len = el.value.length;
+  countEl.textContent = `${len} / ${max}`;
+  countEl.className = 'char-count' + (len > max * 0.9 ? (len >= max ? ' over' : ' warn') : '');
+}
+
+function countWords(inputId, countId, max) {
+  const el = document.getElementById(inputId);
+  const countEl = document.getElementById(countId);
+  const words = el.value.trim() ? el.value.trim().split(/\s+/).length : 0;
+  countEl.textContent = `${words} / ${max} words`;
+  countEl.className = 'char-count' + (words > max * 0.9 ? (words >= max ? ' over' : ' warn') : '');
+  if (words > max) {
+    // Hard trim to max words
+    const trimmed = el.value.trim().split(/\s+/).slice(0, max).join(' ');
+    el.value = trimmed;
+    countEl.textContent = `${max} / ${max} words`;
+    countEl.className = 'char-count over';
+  }
+}
+
+// ── DEMO TOGGLE ──
+function setDemo(val) {
+  isDemo = val;
+  document.getElementById('demoYes').className = 'toggle-pill-btn' + (val ? ' active yes' : '');
+  document.getElementById('demoNo').className  = 'toggle-pill-btn' + (!val ? ' active no' : '');
+  document.getElementById('demoHint').textContent = val
+    ? 'This campaign uses demo/test player data — it will not affect live players.'
+    : 'This campaign will run against live player data.';
+}
+
+// ── ONGOING TOGGLE ──
+function toggleOngoing() {
+  isOngoing = !isOngoing;
+  const tog = document.getElementById('ongoingToggle');
+  const endWrap = document.getElementById('endDateWrap');
+  const sep = document.getElementById('dateSep');
+  const hint = document.getElementById('dateHint');
+
+  tog.classList.toggle('active', isOngoing);
+  endWrap.style.opacity = isOngoing ? '0.35' : '1';
+  endWrap.style.pointerEvents = isOngoing ? 'none' : '';
+  document.getElementById('endDate').disabled = isOngoing;
+  sep.style.opacity = isOngoing ? '0.3' : '1';
+  hint.textContent = isOngoing
+    ? 'Campaign runs from the start date indefinitely — no end date.'
+    : 'Campaign will run from the start date until the end date.';
+}
+
+// ── ENTRY TYPE ──
+function setEntry(type) {
+  entryType = type;
+  document.getElementById('entrySingle').className = 'seg-btn' + (type === 'single' ? ' active green' : '');
+  document.getElementById('entryMulti').className  = 'seg-btn' + (type === 'multi'  ? ' active green' : '');
+  const body = document.getElementById('entryBody');
+  body.classList.toggle('open', type === 'multi');
+}
+
+// ── RE-ENTRY ──
+function setReentry(val) {
+  reentryAllowed = val;
+  document.getElementById('reentryYes').className = 'toggle-pill-btn' + (val  ? ' active yes' : '');
+  document.getElementById('reentryNo').className  = 'toggle-pill-btn' + (!val ? ' active no'  : '');
+  document.getElementById('reentryBody').classList.toggle('open', val);
+}
+
+// ── INTERVAL ──
+function setInterval(type) {
+  intervalType = type;
+  document.getElementById('intAlways').className    = 'seg-btn' + (type === 'always'    ? ' active green' : '');
+  document.getElementById('intScheduled').className = 'seg-btn' + (type === 'scheduled' ? ' active green' : '');
+  document.getElementById('intervalBody').classList.toggle('open', type === 'scheduled');
+}
+
+// ── DAY PICKER ──
+function toggleDay(btn) {
+  const day = btn.dataset.day;
+  if (activeDays.has(day)) { activeDays.delete(day); btn.classList.remove('active'); }
+  else { activeDays.add(day); btn.classList.add('active'); }
+}
+
+function applyPreset(preset) {
+  const all = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const weekdays = ['Mon','Tue','Wed','Thu','Fri'];
+  const weekends = ['Sat','Sun'];
+
+  let target;
+  if (preset === 'weekdays') target = new Set(weekdays);
+  else if (preset === 'weekends') target = new Set(weekends);
+  else target = new Set(all);
+
+  activeDays = target;
+  document.querySelectorAll('.day-btn').forEach(btn => {
+    btn.classList.toggle('active', activeDays.has(btn.dataset.day));
+  });
+
+  // Highlight active preset
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ── COOLDOWN ──
+function setCooldown(val) {
+  cooldown = val;
+  ['coolNone','cool1d','cool1w','cool1m','coolCustom'].forEach(id => {
+    document.getElementById(id).classList.remove('active','green');
+  });
+  const idMap = {none:'coolNone','1d':'cool1d','1w':'cool1w','1m':'cool1m','custom':'coolCustom'};
+  const activeEl = document.getElementById(idMap[val]);
+  if (activeEl) { activeEl.classList.add('active','green'); }
+  document.getElementById('coolCustomWrap').style.display = val === 'custom' ? 'block' : 'none';
+}
+
+// ── LAUNCH CANVAS ──
+function launchCanvas() {
+  // Collect all form data
+  const data = {
+    name:     document.getElementById('campaignName').value,
+    category: document.getElementById('campaignCategory').value,
+    isDemo,
+    startDate:   document.getElementById('startDate').value,
+    endDate:     isOngoing ? null : document.getElementById('endDate').value,
+    ongoing:     isOngoing,
+    comments:    document.getElementById('campaignComments').value,
+    entryType,
+    entryCap:    document.getElementById('entryCap').value || null,
+    reentryAllowed,
+    reentryMax:  document.getElementById('reentryMax').value || null,
+    intervalType,
+    activeDays:  [...activeDays],
+    cooldown,
+  };
+  console.log('Campaign config:', data);
+  // → In production: POST to API, then redirect to canvas with campaign ID
+  alert(`✓ Campaign "${data.name || 'Untitled'}" configured!\n\nRedirecting to canvas builder…`);
+}
+
+function cancelSetup() {
+  if (confirm('Cancel campaign setup? Any unsaved progress will be lost.')) {
+    history.back();
+  }
+}
+
+// ── INIT ──
+updateUI();
+// Set today as default start date
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('startDate').value = today;
+</script>
+</body>
+</html>
