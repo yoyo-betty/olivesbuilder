@@ -5943,19 +5943,32 @@ function p2InitIfNeeded() {
     <div class="palette-section">
       <div class="section-toggle" onclick="p2ToggleSec('gact')"><span class="section-arrow open" id="p2arr-gact">›</span> Activities</div>
       <div class="section-items" id="p2sec-gact">
-        <div class="node-item" onclick="p2GoalAddAction('bonus','🎁','Add Bonus')">      <div class="ni-icon nc-activity">🎁</div><span class="ni-label">Add Bonus</span></div>
-        <div class="node-item" onclick="p2GoalAddAction('coins','🪙','Betty Coins')">    <div class="ni-icon nc-activity">🪙</div><span class="ni-label">Betty Coins</span></div>
-        <div class="node-item" onclick="p2GoalAddAction('leaderboard','🏆','Leaderboard')"><div class="ni-icon nc-activity">🏆</div><span class="ni-label">Leaderboard</span></div>
-        <div class="node-item" onclick="p2GoalAddAction('tag','🏷','Add Tag')">          <div class="ni-icon nc-data">🏷</div><span class="ni-label">Add/Remove Tag</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('bonus','🎁','Add Bonus')">          <div class="ni-icon nc-activity">🎁</div><span class="ni-label">Add Bonus</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('coins','🪙','Betty Coins')">        <div class="ni-icon nc-activity">🪙</div><span class="ni-label">Betty Coins</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('leaderboard','🏆','Leaderboard')">  <div class="ni-icon nc-activity">🏆</div><span class="ni-label">Leaderboard</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('mission','🎯','Mission')">           <div class="ni-icon nc-activity">🎯</div><span class="ni-label">Mission</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('tournament','🥇','Tournament')">     <div class="ni-icon nc-activity">🥇</div><span class="ni-label">Tournament</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('skin','🎮','Game Skin')">            <div class="ni-icon nc-activity">🎮</div><span class="ni-label">Game Skin On/Off</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('shop','🛍','Go to Shop')">           <div class="ni-icon nc-activity">🛍</div><span class="ni-label">Go to Shop</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('esb','🌐','ESB Tools')">            <div class="ni-icon nc-activity">🌐</div><span class="ni-label">ESB Engagement Tools</span></div>
       </div>
     </div>
     <div class="palette-section">
       <div class="section-toggle" onclick="p2ToggleSec('gcomms')"><span class="section-arrow open" id="p2arr-gcomms">›</span> Communications</div>
       <div class="section-items" id="p2sec-gcomms">
-        <div class="node-item" onclick="p2GoalAddAction('rtmsg','💬','Real-Time Msg')"><div class="ni-icon nc-comms">💬</div><span class="ni-label">Real-Time Message</span></div>
-        <div class="node-item" onclick="p2GoalAddAction('email','📧','Email')">         <div class="ni-icon nc-comms">📧</div><span class="ni-label">Email</span></div>
-        <div class="node-item" onclick="p2GoalAddAction('sms','📱','SMS')">             <div class="ni-icon nc-comms">📱</div><span class="ni-label">SMS</span></div>
-        <div class="node-item" onclick="p2GoalAddAction('push','🔔','Push')">           <div class="ni-icon nc-comms">🔔</div><span class="ni-label">Push Notification</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('rtmsg','💬','Real-Time Msg')">  <div class="ni-icon nc-comms">💬</div><span class="ni-label">Real-Time Message</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('email','📧','Email')">           <div class="ni-icon nc-comms">📧</div><span class="ni-label">Email</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('sms','📱','SMS')">               <div class="ni-icon nc-comms">📱</div><span class="ni-label">SMS</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('push','🔔','Push')">             <div class="ni-icon nc-comms">🔔</div><span class="ni-label">Push Notification</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('slack','💼','Slack')">            <div class="ni-icon nc-comms">💼</div><span class="ni-label">Slack (Internal)</span></div>
+      </div>
+    </div>
+    <div class="palette-section">
+      <div class="section-toggle" onclick="p2ToggleSec('gpdata')"><span class="section-arrow open" id="p2arr-gpdata">›</span> Player Data</div>
+      <div class="section-items" id="p2sec-gpdata">
+        <div class="node-item" onclick="p2GoalAddAction('tag','🏷','Add/Remove Tag')">   <div class="ni-icon nc-data">🏷</div><span class="ni-label">Add/Remove Tag</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('vip','⭐','Change VIP')">       <div class="ni-icon nc-data">⭐</div><span class="ni-label">Change VIP Level</span></div>
+        <div class="node-item" onclick="p2GoalAddAction('status','📊','Change Status')"> <div class="ni-icon nc-data">📊</div><span class="ni-label">Change Status Level</span></div>
       </div>
     </div>
     <div style="margin-top:auto;padding:12px;border-top:1px solid var(--border);font-size:9px;color:var(--text3);line-height:1.7;font-family:'Inter',sans-serif">
@@ -7591,12 +7604,21 @@ function p2CfgSave() {
 // ── GOAL TRACK RENDER ──
 var P2_ACTIONS=[
   {type:'bonus',icon:'🎁',label:'Add Bonus'},
-  {type:'rtmsg',icon:'💬',label:'Message'},
-  {type:'email',icon:'📧',label:'Email'},
-  {type:'sms',icon:'📱',label:'SMS'},
-  {type:'tag',icon:'🏷',label:'Add Tag'},
   {type:'coins',icon:'🪙',label:'Betty Coins'},
   {type:'leaderboard',icon:'🏆',label:'Leaderboard'},
+  {type:'mission',icon:'🎯',label:'Mission'},
+  {type:'tournament',icon:'🥇',label:'Tournament'},
+  {type:'skin',icon:'🎮',label:'Game Skin'},
+  {type:'shop',icon:'🛍',label:'Go to Shop'},
+  {type:'esb',icon:'🌐',label:'ESB Tools'},
+  {type:'rtmsg',icon:'💬',label:'Real-Time Msg'},
+  {type:'email',icon:'📧',label:'Email'},
+  {type:'sms',icon:'📱',label:'SMS'},
+  {type:'push',icon:'🔔',label:'Push'},
+  {type:'slack',icon:'💼',label:'Slack'},
+  {type:'tag',icon:'🏷',label:'Add/Remove Tag'},
+  {type:'vip',icon:'⭐',label:'Change VIP'},
+  {type:'status',icon:'📊',label:'Change Status'},
 ];
 
 function p2RenderGoalTrack() {
