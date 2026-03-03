@@ -29,7 +29,18 @@
   position: fixed; inset: 0; overflow: hidden;
   display: none;
 }
-#page-home.active, #page-canvas.active, #page-home2.active { display: block; overflow-y: auto; background: var(--bg); }
+#page-home.active {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+#page-home-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  position: relative;
+}
+#page-canvas.active, #page-home2.active { display: block; overflow-y: auto; background: var(--bg); }
 #page-canvas2.active { display: block; }
 #page-features.active { display: block; }
 #page-features { overflow-y: auto; background: var(--bg); }
@@ -67,7 +78,7 @@ body::before{
 
 /* ── TOPBAR ── */
 #page-home .topbar{
-  position:sticky;top:0;height:54px;
+  position:relative;top:auto;height:54px;flex-shrink:0;
   background:rgba(22,25,33,0.95);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;padding:0 32px;
@@ -98,6 +109,9 @@ body::before{
 }
 .nav-link:hover{color:var(--text);background:var(--surface2)}
 .nav-link.active{color:var(--text);background:var(--surface2)}
+.canvas-view-tab{padding:5px 14px;font-size:11px;font-weight:600;border:1px solid transparent;border-radius:6px;cursor:pointer;color:var(--text3);background:transparent;font-family:'Inter',sans-serif;transition:all 0.14s}
+.canvas-view-tab:hover{color:var(--text2);background:var(--surface2)}
+.canvas-view-tab.active{background:var(--surface2);border-color:var(--border2);color:var(--text)}
 
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 
@@ -117,7 +131,7 @@ body::before{
 .btn-primary:hover{background:#16a34a;box-shadow:0 0 26px rgba(34,197,94,0.35)}
 
 /* ── PAGE BODY ── */
-.page{max-width:1200px;margin:0 auto;padding:40px 32px 80px;position:relative;z-index:1}
+.page{max-width:1200px;margin:0 auto;padding:40px 32px 80px}
 
 /* ── PAGE HEADER ── */
 .page-header{
@@ -1129,10 +1143,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   </div>
   <div class="vsep"></div>
   <nav class="nav-links">
-    <button class="nav-link active">Journeys</button>
-    <button class="nav-link">Analytics</button>
-    <button class="nav-link">Players</button>
-    <button class="nav-link">Settings</button>
+    <button class="nav-link active" onclick="homeTab('journeys',this)">Journeys</button>
+    <button class="nav-link"        onclick="homeTab('analytics',this)">Analytics</button>
+    <button class="nav-link"        onclick="homeTab('players',this)">Players</button>
+    <button class="nav-link"        onclick="homeTab('settings',this)">Settings</button>
   </nav>
   <div class="topbar-right">
     <button class="btn btn-ghost" onclick="openTemplates()">📋 From Template</button>
@@ -1141,9 +1155,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
     <button class="btn" onclick="showPage('home2')" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);border-color:#6d28d9;color:#fff;font-weight:700;font-size:11px;letter-spacing:0.04em;box-shadow:0 0 14px rgba(124,58,237,0.35)">Goal System</button>
   </div>
 </header>
+<div id="page-home-content">
 
 <!-- PAGE -->
-<div class="page">
+<div class="page" id="homeJourneysView">
 
   <!-- PAGE HEADER -->
   <div class="page-header">
@@ -1773,6 +1788,281 @@ input[type=date].su-input::-webkit-calendar-picker-indicator{filter:invert(0.4) 
 </div><!-- /setupOverlay -->
 </div>
 
+
+<!-- ══════ SERVICE ANALYTICS VIEW ══════ -->
+<div id="homeAnalyticsView" style="display:none">
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-eyebrow">Service Analytics</div>
+      <div class="page-title">Platform Overview</div>
+      <div class="page-sub">Aggregated performance across all campaigns. Understand system-wide health, trends and channel efficiency.</div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <select id="analyticsRange" onchange="renderHomeAnalytics()" style="height:32px;padding:0 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:11px;font-family:'Inter',sans-serif;cursor:pointer">
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+      <button class="btn btn-ghost" style="font-size:11px">⬇ Export</button>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px" id="anKpiRow">
+    <div class="stat-card" style="border-left:3px solid #4ade80">
+      <div class="stat-label">Total Players Enrolled</div>
+      <div class="stat-value">47,821</div>
+      <div class="stat-sub"><span style="font-size:10px;font-weight:700;color:#4ade80;background:rgba(74,222,128,0.12);padding:1px 6px;border-radius:4px">↑ 12%</span><span style="margin-left:6px">vs prev period</span></div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #38bdf8">
+      <div class="stat-label">Flow Completion Rate</div>
+      <div class="stat-value">61.4%</div>
+      <div class="stat-sub"><span style="font-size:10px;font-weight:700;color:#f87171;background:rgba(248,113,113,0.12);padding:1px 6px;border-radius:4px">↓ 2%</span><span style="margin-left:6px">vs prev period</span></div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #a78bfa">
+      <div class="stat-label">Goal Achievement Rate</div>
+      <div class="stat-value">34.7%</div>
+      <div class="stat-sub"><span style="font-size:10px;font-weight:700;color:#4ade80;background:rgba(74,222,128,0.12);padding:1px 6px;border-radius:4px">↑ 8%</span><span style="margin-left:6px">vs prev period</span></div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #fbbf24">
+      <div class="stat-label">Avg. Time to Complete</div>
+      <div class="stat-value">4.2d</div>
+      <div class="stat-sub"><span style="font-size:10px;font-weight:700;color:#4ade80;background:rgba(74,222,128,0.12);padding:1px 6px;border-radius:4px">↑ faster</span><span style="margin-left:6px">-0.6d</span></div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #f87171">
+      <div class="stat-label">Drop-off Rate</div>
+      <div class="stat-value">18.2%</div>
+      <div class="stat-sub"><span style="font-size:10px;font-weight:700;color:#4ade80;background:rgba(74,222,128,0.12);padding:1px 6px;border-radius:4px">↓ 3%</span><span style="margin-left:6px">improving</span></div>
+    </div>
+  </div>
+
+  <!-- ROW 1: Sparkline trend + Outcome funnel -->
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:16px;display:flex;align-items:center;gap:7px"><span>📈</span> Player Entries — Daily</div>
+      <div style="display:flex;align-items:flex-end;gap:3px;height:90px" id="anSparkWrap">
+        <!-- JS rendered -->
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:9px;color:var(--text3)" id="anSparkDates"></div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:7px"><span>🏁</span> Outcome Funnel</div>
+      <div id="anFunnelWrap" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Top campaigns + Channel mix -->
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:7px"><span>🏆</span> Top Campaigns by Goal Rate</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Campaign</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Players</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Goal Rate</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Completion</th>
+        </tr></thead>
+        <tbody id="anTopTable"></tbody>
+      </table>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:7px"><span>📡</span> Channel Message Volume</div>
+      <div id="anChannelBars" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div style="margin-top:18px;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:7px"><span>🚪</span> Exit Reasons</div>
+      <div id="anExitBars" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Category performance + Trigger types -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:7px"><span>🗂</span> Category Performance</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Category</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Campaigns</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Avg Goal%</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Players</th>
+        </tr></thead>
+        <tbody id="anCatTable"></tbody>
+      </table>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:7px"><span>⚡</span> Trigger Type Mix</div>
+      <div id="anTriggerBars" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div style="margin-top:18px;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:7px"><span>📅</span> Schedule vs Real-time</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:8px">
+        <div style="flex:1;height:14px;background:var(--border2);border-radius:7px;overflow:hidden;display:flex">
+          <div style="width:62%;background:linear-gradient(90deg,#7c3aed,#4f46e5);border-radius:7px 0 0 7px"></div>
+          <div style="width:38%;background:linear-gradient(90deg,#0284c7,#38bdf8)"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text3);white-space:nowrap">62% Real-time · 38% Schedule</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════ PLAYERS VIEW ══════ -->
+<div id="homePlayersView" style="display:none">
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-eyebrow">Player Lookup</div>
+      <div class="page-title">Players</div>
+      <div class="page-sub">Search individual player journey history, goal progress and live campaign state. Primarily for CS teams, QA and manual overrides.</div>
+    </div>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;display:flex;gap:10px;align-items:center">
+    <div style="flex:1;position:relative">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3)">🔍</span>
+      <input type="text" placeholder="Search by Player ID, username or email…" oninput="homePlayersSearch(this.value)" style="width:100%;padding:9px 12px 9px 36px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;box-sizing:border-box"/>
+    </div>
+    <select style="height:36px;padding:0 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:11px;font-family:'Inter',sans-serif;cursor:pointer">
+      <option>All Campaigns</option><option>Active Only</option><option>Goal Achieved</option><option>Dropped Out</option>
+    </select>
+    <select style="height:36px;padding:0 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:11px;font-family:'Inter',sans-serif;cursor:pointer">
+      <option>All Statuses</option><option>In Progress</option><option>Completed</option><option>Exited Early</option>
+    </select>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border)">
+          <th style="padding:10px 16px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Player</th>
+          <th style="padding:10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Campaign</th>
+          <th style="padding:10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Status</th>
+          <th style="padding:10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Goal Progress</th>
+          <th style="padding:10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Current Node</th>
+          <th style="padding:10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Entered</th>
+          <th style="padding:10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left"></th>
+        </tr>
+      </thead>
+      <tbody id="homePlayersBody"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:10px;font-size:10px;color:var(--text3);text-align:center">Showing representative sample data · Live player state requires backend API</div>
+</div>
+</div>
+
+<!-- ══════ SETTINGS VIEW ══════ -->
+<div id="homeSettingsView" style="display:none">
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-eyebrow">Platform Configuration</div>
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Channel credentials, team access, suppression lists, integrations and taxonomy configuration.</div>
+    </div>
+    <div style="margin-left:auto"><button class="btn btn-primary" style="font-size:11px">Save Changes</button></div>
+  </div>
+  <div style="display:grid;grid-template-columns:190px 1fr;gap:16px;align-items:start">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;position:sticky;top:16px">
+      <div onclick="homeSettingsSec('channels',this)" style="padding:9px 12px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;margin-bottom:2px;background:var(--surface2)" class="set-nav-item active">📡 Channels</div>
+      <div onclick="homeSettingsSec('team',this)" style="padding:9px 12px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;margin-bottom:2px" class="set-nav-item">👥 Team &amp; Access</div>
+      <div onclick="homeSettingsSec('suppression',this)" style="padding:9px 12px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;margin-bottom:2px" class="set-nav-item">🚫 Suppression</div>
+      <div onclick="homeSettingsSec('integrations',this)" style="padding:9px 12px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;margin-bottom:2px" class="set-nav-item">🔌 Integrations</div>
+      <div onclick="homeSettingsSec('categories',this)" style="padding:9px 12px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;margin-bottom:2px" class="set-nav-item">🏷 Categories</div>
+      <div onclick="homeSettingsSec('ratelimits',this)" style="padding:9px 12px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer" class="set-nav-item">⏱ Rate Limits</div>
+    </div>
+    <div>
+      <div id="set-channels" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px">📡 Channel Credentials</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px">📧 Email</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:5px">Sender domain: <strong style="color:var(--text)">comms.brandname.com</strong></div>
+            <div style="font-size:11px;color:var(--text2)">Provider: <strong style="color:var(--text)">SendGrid</strong></div>
+            <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;color:#4ade80">● Connected · Last test OK 2h ago</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px">📱 SMS</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:5px">Provider: <strong style="color:var(--text)">Twilio</strong></div>
+            <div style="font-size:11px;color:var(--text2)">Sender ID: <strong style="color:var(--text)">BRANDNAME</strong></div>
+            <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;color:#4ade80">● Connected · Last test OK 1h ago</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px">🔔 Push</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:5px">iOS: <strong style="color:var(--text)">APN Certificate ✓</strong></div>
+            <div style="font-size:11px;color:var(--text2)">Android: <strong style="color:var(--text)">FCM Key ✓</strong></div>
+            <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;color:#4ade80">● Connected</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px">💼 Slack</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:5px">Workspace: <strong style="color:var(--text)">BrandTeam</strong></div>
+            <div style="font-size:11px;color:var(--text2)">Default: <strong style="color:var(--text)">#crm-alerts</strong></div>
+            <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;color:#4ade80">● Connected</div>
+          </div>
+        </div>
+      </div>
+      <div id="set-team" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px">👥 Team Members &amp; Roles</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr style="border-bottom:1px solid var(--border)">
+            <th style="padding:0 0 10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Name</th>
+            <th style="padding:0 0 10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3)">Role</th>
+            <th style="padding:0 0 10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3)">Can Publish</th>
+            <th style="padding:0 0 10px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3)">Last Active</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:10px 0"><div style="font-weight:600;color:var(--text)">Sarah K.</div><div style="font-size:10px;color:var(--text3)">sarah@brand.com</div></td><td style="text-align:center"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(124,58,237,0.15);color:#a78bfa">Admin</span></td><td style="text-align:center;color:#4ade80;font-size:12px">✓</td><td style="color:var(--text3)">Today</td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:10px 0"><div style="font-weight:600;color:var(--text)">James T.</div><div style="font-size:10px;color:var(--text3)">james@brand.com</div></td><td style="text-align:center"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(56,189,248,0.12);color:#38bdf8">Editor</span></td><td style="text-align:center;color:#4ade80;font-size:12px">✓</td><td style="color:var(--text3)">Yesterday</td></tr>
+            <tr><td style="padding:10px 0"><div style="font-weight:600;color:var(--text)">Priya M.</div><div style="font-size:10px;color:var(--text3)">priya@brand.com</div></td><td style="text-align:center"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(74,222,128,0.1);color:#4ade80">Viewer</span></td><td style="text-align:center;color:var(--text3)">—</td><td style="color:var(--text3)">3 days ago</td></tr>
+          </tbody>
+        </table>
+        <button class="btn btn-ghost" style="margin-top:14px;font-size:11px">+ Invite Team Member</button>
+      </div>
+      <div id="set-suppression" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">🚫 Global Suppression List</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Players on this list are excluded from all campaign entry, regardless of trigger conditions. Useful for VIPs, staff accounts, and opted-out players.</div>
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <input type="text" placeholder="Player ID or email to suppress…" style="flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif"/>
+          <button class="btn btn-primary" style="font-size:11px">+ Add</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">247 players currently suppressed · <span style="color:#a78bfa;cursor:pointer">Export CSV</span> · <span style="color:#a78bfa;cursor:pointer">Import CSV</span></div>
+      </div>
+      <div id="set-integrations" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px">🔌 Integrations &amp; Webhooks</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:12px;font-weight:600;color:var(--text)">Kafka Event Bus</div><div style="font-size:10px;color:var(--text3);margin-top:3px">player.events · player.tags · player.deposits</div></div><span style="font-size:9px;color:#4ade80">● Live</span></div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:12px;font-weight:600;color:var(--text)">Tag Write Webhook</div><div style="font-size:10px;color:var(--text3);margin-top:3px">https://api.brand.com/v2/tags/write</div></div><span style="font-size:9px;color:#4ade80">● Live</span></div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:12px;font-weight:600;color:var(--text)">BigQuery Export</div><div style="font-size:10px;color:var(--text3);margin-top:3px">Daily batch sync · 03:00 UTC</div></div><span style="font-size:9px;color:#38bdf8">● Scheduled</span></div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:12px;font-weight:600;color:var(--text)">Goal Listener Service</div><div style="font-size:10px;color:var(--text3);margin-top:3px">Redis state · Kafka consumer · SLA &lt;2s</div></div><span style="font-size:9px;color:#4ade80">● Live</span></div>
+        </div>
+      </div>
+      <div id="set-categories" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">🏷 Campaign Categories</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:14px">These appear as options in the campaign setup wizard and as filter pills in the Journey Manager.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+          <span style="padding:5px 12px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);border-radius:6px;font-size:11px;font-weight:600;color:#38bdf8">Retention</span>
+          <span style="padding:5px 12px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:6px;font-size:11px;font-weight:600;color:#4ade80">Reactivation</span>
+          <span style="padding:5px 12px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);border-radius:6px;font-size:11px;font-weight:600;color:#fbbf24">Conversion</span>
+          <span style="padding:5px 12px;background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.25);border-radius:6px;font-size:11px;font-weight:600;color:#f472b6">Acquisition</span>
+          <span style="padding:5px 12px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);border-radius:6px;font-size:11px;font-weight:600;color:#a78bfa">VIP</span>
+          <span style="padding:5px 12px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);border-radius:6px;font-size:11px;font-weight:600;color:#f87171">Churn Prevention</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <input type="text" placeholder="New category name…" style="flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif"/>
+          <button class="btn btn-primary" style="font-size:11px">+ Add</button>
+        </div>
+      </div>
+      <div id="set-ratelimits" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">⏱ Global Rate Limits</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Maximum messages a single player can receive across all campaigns per channel per day. Prevents communication fatigue.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px;font-weight:600;color:var(--text)">📧 Email</div><div style="display:flex;align-items:center;gap:8px"><input type="number" value="3" style="width:48px;padding:4px 8px;background:var(--surface);border:1px solid var(--border2);border-radius:5px;color:var(--text);font-size:12px;text-align:center;font-family:'Inter',sans-serif"/><span style="font-size:11px;color:var(--text3)">per day</span></div></div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px;font-weight:600;color:var(--text)">📱 SMS</div><div style="display:flex;align-items:center;gap:8px"><input type="number" value="2" style="width:48px;padding:4px 8px;background:var(--surface);border:1px solid var(--border2);border-radius:5px;color:var(--text);font-size:12px;text-align:center;font-family:'Inter',sans-serif"/><span style="font-size:11px;color:var(--text3)">per day</span></div></div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px;font-weight:600;color:var(--text)">🔔 Push</div><div style="display:flex;align-items:center;gap:8px"><input type="number" value="5" style="width:48px;padding:4px 8px;background:var(--surface);border:1px solid var(--border2);border-radius:5px;color:var(--text);font-size:12px;text-align:center;font-family:'Inter',sans-serif"/><span style="font-size:11px;color:var(--text3)">per day</span></div></div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:14px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px;font-weight:600;color:var(--text)">💬 In-app</div><div style="display:flex;align-items:center;gap:8px"><input type="number" value="10" style="width:48px;padding:4px 8px;background:var(--surface);border:1px solid var(--border2);border-radius:5px;color:var(--text);font-size:12px;text-align:center;font-family:'Inter',sans-serif"/><span style="font-size:11px;color:var(--text3)">per day</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- /page-home-content -->
 <!-- ══════════════════════════════════════
      PAGE: CANVAS (journey builder)
 ══════════════════════════════════════ -->
@@ -1784,6 +2074,10 @@ input[type=date].su-input::-webkit-calendar-picker-indicator{filter:invert(0.4) 
   <div class="vsep"></div>
   <input class="campaign-name" id="campaignName" value="Tournament Re-engagement Q3" />
   <div class="topbar-status"><div class="status-dot" id="statusDot"></div><span id="statusLabel">Draft</span></div>
+  <div style="margin-left:10px;display:flex;gap:2px">
+    <button class="canvas-view-tab active" id="cvt-builder" onclick="canvasViewTab('builder',this)">&#9889; Journey</button>
+    <button class="canvas-view-tab" id="cvt-analytics" onclick="canvasViewTab('analytics',this)">&#128202; Analytics</button>
+  </div>
   <div class="topbar-actions">
     <button class="icon-btn" title="Undo (Ctrl+Z)" onclick="undo()">↩</button>
     <button class="icon-btn" title="Redo (Ctrl+Y)" onclick="redo()">↪</button>
@@ -1956,6 +2250,130 @@ input[type=date].su-input::-webkit-calendar-picker-indicator{filter:invert(0.4) 
 
 <!-- DRAG GHOST -->
 <div id="dragGhost"><div class="dg-card"><div class="dg-icon"></div><div class="dg-label"></div></div></div>
+</div>
+
+
+<!-- ══════ CAMPAIGN ANALYTICS OVERLAY (Phase 1) ══════ -->
+<div id="campaignAnalyticsOverlay" style="display:none;position:absolute;inset:0;z-index:80;background:var(--bg);overflow-y:auto">
+<div class="page">
+  <div class="page-header" style="margin-bottom:20px">
+    <div class="page-header-left">
+      <div class="page-eyebrow">Campaign Analytics</div>
+      <div class="page-title" id="campAnalyticsCampaignName">Tournament Re-engagement Q3</div>
+      <div class="page-sub">Per-campaign performance — player flow, node conversion, goal tracking and channel efficiency.</div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <select id="campAnalyticsRange" onchange="renderCampaignAnalytics()" style="height:32px;padding:0 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:11px;font-family:'Inter',sans-serif;cursor:pointer">
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="all">All time</option>
+      </select>
+      <button class="btn btn-ghost" style="font-size:11px">⬇ Export</button>
+    </div>
+  </div>
+
+  <!-- STATUS STRIP -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;align-items:center">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-right:4px">Status</div>
+    <div style="display:flex;align-items:center;gap:5px;padding:4px 12px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:6px">
+      <div style="width:7px;height:7px;background:#4ade80;border-radius:50%"></div>
+      <span style="font-size:11px;font-weight:700;color:#4ade80">Active</span>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-left:8px">Live since <strong style="color:var(--text2)">Jan 14, 2026</strong> · <strong style="color:var(--text2)">17 days</strong> running</div>
+    <div style="margin-left:auto;font-size:11px;color:var(--text3)">Trigger: <strong style="color:var(--text2)">Real-time · Tournament Inactive</strong></div>
+    <div style="font-size:11px;color:var(--text3)">Category: <strong style="color:var(--text2)">Retention</strong></div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px">
+    <div class="stat-card" style="border-left:3px solid #4ade80">
+      <div class="stat-label">Players Enrolled</div>
+      <div class="stat-value" style="font-size:22px">3,247</div>
+      <div class="stat-sub">↑ 124 today</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #a78bfa">
+      <div class="stat-label">Goal Achieved</div>
+      <div class="stat-value" style="font-size:22px">38.4%</div>
+      <div class="stat-sub" style="color:#a78bfa">1,247 players</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #38bdf8">
+      <div class="stat-label">Flow Completed</div>
+      <div class="stat-value" style="font-size:22px">54.1%</div>
+      <div class="stat-sub">Without goal exit</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #fbbf24">
+      <div class="stat-label">Avg Time in Flow</div>
+      <div class="stat-value" style="font-size:22px">3.8d</div>
+      <div class="stat-sub">Median 2.4d</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #f87171">
+      <div class="stat-label">Drop-off Rate</div>
+      <div class="stat-value" style="font-size:22px">7.5%</div>
+      <div class="stat-sub">↓ Improving</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #f97316">
+      <div class="stat-label">Currently Active</div>
+      <div class="stat-value" style="font-size:22px">342</div>
+      <div class="stat-sub">In journey now</div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Daily entries sparkline + Funnel -->
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:14px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
+        <span>📈 Player Entries — Daily</span>
+        <span style="font-size:10px;font-weight:400;color:var(--text3)">Last 30 days</span>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:3px;height:80px" id="campSparkWrap"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:9px;color:var(--text3)" id="campSparkDates"></div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px">🏁 Journey Funnel</div>
+      <div id="campFunnelWrap" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Node performance + Channel breakdown -->
+  <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:14px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px">🗺 Node-by-Node Performance</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:left">Node</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Reached</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Passed</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Drop</th>
+          <th style="padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);text-align:right">Avg Wait</th>
+        </tr></thead>
+        <tbody id="campNodeTable"></tbody>
+      </table>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px">📡 Channel Performance</div>
+      <div id="campChannelRows" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Goal timeline + Exit reasons -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px">🎯 Goal Achievement Over Time</div>
+      <div style="display:flex;align-items:flex-end;gap:3px;height:70px" id="campGoalSpark"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:9px;color:var(--text3)" id="campGoalDates"></div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:16px">
+        <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Goal exits early</div><div style="font-size:18px;font-weight:800;color:#a78bfa">847</div></div>
+        <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Goal at end of flow</div><div style="font-size:18px;font-weight:800;color:#38bdf8">400</div></div>
+        <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Avg days to goal</div><div style="font-size:18px;font-weight:800;color:#4ade80">2.1d</div></div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px">🚪 Exit Reason Breakdown</div>
+      <div id="campExitBars" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+
+</div>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -3690,12 +4108,360 @@ function toast(msg) {
 // ── INIT ──
 renderAll();
 
+// HOME NAV TABS
+function homeTab(tab, btn) {
+  document.querySelectorAll('.nav-link').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var views = ['homeJourneysView','homeAnalyticsView','homePlayersView','homeSettingsView'];
+  views.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
+  // Map tab names to view IDs
+  var map = {journeys:'homeJourneysView',analytics:'homeAnalyticsView',players:'homePlayersView',settings:'homeSettingsView'};
+  var viewId = map[tab];
+  var view = document.getElementById(viewId);
+  if (view) view.style.display = 'block';
+  if (tab === 'analytics') renderHomeAnalytics();
+  if (tab === 'players') renderHomePlayers();
+}
+
+// Ensure journeys view shows on load
+(function(){
+  var jv = document.getElementById('homeJourneysView');
+  if (jv) jv.style.display = 'block';
+  ['homeAnalyticsView','homePlayersView','homeSettingsView'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.style.display='none';
+  });
+})();
+
+// HOME ANALYTICS RENDER
+function renderHomeAnalytics() {
+  // Sparkline
+  var sparkWrap = document.getElementById('anSparkWrap');
+  if (sparkWrap) {
+    var vals = [140,165,182,155,198,221,210,235,248,220,210,242,259,241,278,265,258,240,282,305,291,265,315,328,310,295,338,351,342,326];
+    var max = Math.max.apply(null, vals);
+    sparkWrap.innerHTML = vals.map(function(v,i){
+      var h = Math.max(5, Math.round((v/max)*86));
+      return '<div style="flex:1;background:'+(i===vals.length-1?'#4ade80':'rgba(74,222,128,0.3)')+';border-radius:2px 2px 0 0;height:'+h+'px;min-width:3px" title="'+v+' entries"></div>';
+    }).join('');
+    var dates = document.getElementById('anSparkDates');
+    if (dates) dates.innerHTML = '<span>30d ago</span><span>15d ago</span><span>Today</span>';
+  }
+
+  // Outcome funnel
+  var funnel = document.getElementById('anFunnelWrap');
+  if (funnel) {
+    var steps = [
+      {label:'Total Enrolled (all campaigns)',val:47821,pct:100,color:'#4ade80'},
+      {label:'Received at least 1 action',val:45230,pct:94.6,color:'#38bdf8'},
+      {label:'Past 7-day mark',val:38650,pct:80.8,color:'#818cf8'},
+      {label:'Goal achieved',val:16603,pct:34.7,color:'#a78bfa'},
+      {label:'Flow completed (no early exit)',val:29374,pct:61.4,color:'#34d399'},
+    ];
+    funnel.innerHTML = steps.map(function(s){
+      return '<div style="margin-bottom:4px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>'+s.label+'</span><span style="color:var(--text2);font-weight:600">'+s.val.toLocaleString()+' <span style="color:'+s.color+';font-weight:700">'+s.pct+'%</span></span></div><div style="height:8px;background:var(--border2);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+s.pct+'%;background:'+s.color+';border-radius:4px"></div></div></div>';
+    }).join('');
+  }
+
+  // Top campaigns table
+  var topTable = document.getElementById('anTopTable');
+  if (topTable) {
+    var campaigns = [
+      {name:'VIP Retention Drive Q1',players:'4,821',goalRate:'58.3%',completion:'71.2%'},
+      {name:'Tournament Re-engagement',players:'3,247',goalRate:'38.4%',completion:'54.1%'},
+      {name:'Weekend Spin Booster',players:'8,190',goalRate:'31.2%',completion:'66.8%'},
+      {name:'Betty Coins Welcome',players:'12,441',goalRate:'28.7%',completion:'82.3%'},
+      {name:'High-Roller Reactivation',players:'1,088',goalRate:'44.1%',completion:'39.5%'},
+    ];
+    topTable.innerHTML = campaigns.map(function(r,i){
+      return '<tr style="border-top:'+(i>0?'1px solid var(--border)':'none')+'"><td style="padding:9px 0;color:var(--text2)">'+r.name+'</td><td style="padding:9px 6px;text-align:right;font-weight:600">'+r.players+'</td><td style="padding:9px 6px;text-align:right;color:#a78bfa;font-weight:700">'+r.goalRate+'</td><td style="padding:9px 0;text-align:right;color:#38bdf8">'+r.completion+'</td></tr>';
+    }).join('');
+  }
+
+  // Channel bars
+  var chBars = document.getElementById('anChannelBars');
+  if (chBars) {
+    var channels = [
+      {name:'Email',vol:182430,pct:45,color:'#38bdf8'},
+      {name:'Push Notification',vol:98210,pct:24,color:'#f59e0b'},
+      {name:'SMS',vol:61540,pct:15,color:'#4ade80'},
+      {name:'Real-Time Message',vol:44800,pct:11,color:'#818cf8'},
+      {name:'Slack (Internal)',vol:20100,pct:5,color:'#64748b'},
+    ];
+    chBars.innerHTML = channels.map(function(ch){
+      return '<div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>'+ch.name+'</span><span style="font-weight:600;color:var(--text2)">'+ch.vol.toLocaleString()+'</span></div><div style="height:6px;background:var(--border2);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+ch.pct+'%;background:'+ch.color+';border-radius:3px"></div></div></div>';
+    }).join('');
+  }
+
+  // Exit bars
+  var exitBars = document.getElementById('anExitBars');
+  if (exitBars) {
+    var exits = [
+      {label:'Goal achieved (early exit)',pct:52,color:'#a78bfa'},
+      {label:'Flow completed naturally',pct:28,color:'#38bdf8'},
+      {label:'Player opted out',pct:8,color:'#f87171'},
+      {label:'Suppression rule',pct:7,color:'#f59e0b'},
+      {label:'Timeout / inactivity',pct:5,color:'#6b7280'},
+    ];
+    exitBars.innerHTML = exits.map(function(e){
+      return '<div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:2px"><span>'+e.label+'</span><span style="font-weight:700;color:var(--text2)">'+e.pct+'%</span></div><div style="height:5px;background:var(--border2);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+e.pct+'%;background:'+e.color+';border-radius:3px"></div></div></div>';
+    }).join('');
+  }
+
+  // Trigger type bars
+  var trigBars = document.getElementById('anTriggerBars');
+  if (trigBars) {
+    var triggers = [
+      {name:'Player Event (Real-time)',pct:48,color:'#f87171'},
+      {name:'Scheduled (Calendar)',pct:29,color:'#38bdf8'},
+      {name:'Segment Entry/Exit',pct:14,color:'#818cf8'},
+      {name:'Manual / API',pct:9,color:'#64748b'},
+    ];
+    trigBars.innerHTML = triggers.map(function(t){
+      return '<div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>'+t.name+'</span><span style="font-weight:700;color:var(--text2)">'+t.pct+'%</span></div><div style="height:6px;background:var(--border2);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+t.pct+'%;background:'+t.color+';border-radius:3px"></div></div></div>';
+    }).join('');
+  }
+
+  // Category table
+  var catTable = document.getElementById('anCatTable');
+  if (catTable) {
+    var cats = [
+      {cat:'Retention',campaigns:12,avgGoal:'41%',players:'18,420'},
+      {cat:'Re-engagement',campaigns:8,avgGoal:'34%',players:'11,280'},
+      {cat:'Welcome / Onboarding',campaigns:6,avgGoal:'28%',players:'14,100'},
+      {cat:'VIP / High Value',campaigns:5,avgGoal:'52%',players:'3,940'},
+      {cat:'Seasonal / Promo',campaigns:9,avgGoal:'22%',players:'15,300'},
+    ];
+    catTable.innerHTML = cats.map(function(r,i){
+      return '<tr style="border-top:'+(i>0?'1px solid var(--border)':'none')+'"><td style="padding:9px 0;color:var(--text2)">'+r.cat+'</td><td style="padding:9px 6px;text-align:right;font-weight:600">'+r.campaigns+'</td><td style="padding:9px 6px;text-align:right;color:#a78bfa;font-weight:700">'+r.avgGoal+'</td><td style="padding:9px 0;text-align:right;color:var(--text3)">'+r.players+'</td></tr>';
+    }).join('');
+  }
+}
+
+// PLAYERS SEARCH
+function homePlayersSearch(q) {
+  var rows = document.querySelectorAll('#homePlayersBody tr');
+  rows.forEach(function(r){
+    r.style.display = q === '' || r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+// RENDER PLAYERS TABLE
+function renderHomePlayers() {
+  var tbody = document.getElementById('homePlayersBody');
+  if (!tbody || tbody.innerHTML.trim()) return;
+  var players = [
+    {id:'PLR-00421',name:'maxwin_player',email:'max@example.com',campaign:'VIP Retention Drive Q1',status:'In Progress',goal:'72%',node:'Leaderboard',entered:'12 days ago'},
+    {id:'PLR-01882',name:'lucky_spinner',email:'ls@example.com',campaign:'Weekend Spin Booster',status:'Goal Achieved',goal:'100%',node:'—',entered:'3 days ago'},
+    {id:'PLR-05510',name:'highroller99',email:'hr@example.com',campaign:'High-Roller Reactivation',status:'In Progress',goal:'44%',node:'Wait 7 Days',entered:'5 days ago'},
+    {id:'PLR-00078',name:'betty_lover',email:'bl@example.com',campaign:'Betty Coins Welcome',status:'Completed',goal:'100%',node:'—',entered:'21 days ago'},
+    {id:'PLR-03341',name:'jackpot_jane',email:'jj@example.com',campaign:'Tournament Re-engagement',status:'Dropped Out',goal:'18%',node:'—',entered:'8 days ago'},
+    {id:'PLR-07791',name:'spin_master_k',email:'smk@example.com',campaign:'VIP Retention Drive Q1',status:'In Progress',goal:'55%',node:'Email Day 5',entered:'9 days ago'},
+    {id:'PLR-02209',name:'daily_player',email:'dp@example.com',campaign:'Weekend Spin Booster',status:'In Progress',goal:'31%',node:'Condition Split',entered:'2 days ago'},
+    {id:'PLR-08834',name:'promo_hunter',email:'ph@example.com',campaign:'Seasonal / Promo',status:'Goal Achieved',goal:'100%',node:'—',entered:'6 days ago'},
+  ];
+  var statusColors = {'In Progress':'#38bdf8','Goal Achieved':'#4ade80','Completed':'#818cf8','Dropped Out':'#f87171'};
+  tbody.innerHTML = players.map(function(p){
+    var sc = statusColors[p.status] || '#6b7280';
+    return '<tr style="border-top:1px solid var(--border)">'
+      +'<td style="padding:11px 16px"><div style="font-size:11px;font-weight:600;color:var(--text2)">'+p.name+'</div><div style="font-size:10px;color:var(--text3)">'+p.id+'</div></td>'
+      +'<td style="padding:11px 10px;font-size:11px;color:var(--text2)">'+p.campaign+'</td>'
+      +'<td style="padding:11px 10px"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:'+sc+'22;color:'+sc+'">'+p.status+'</span></td>'
+      +'<td style="padding:11px 10px"><div style="width:80px;height:6px;background:var(--border2);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+p.goal+';background:#a78bfa;border-radius:3px"></div></div><div style="font-size:10px;color:var(--text3);margin-top:3px">'+p.goal+'</div></td>'
+      +'<td style="padding:11px 10px;font-size:11px;color:var(--text3)">'+p.node+'</td>'
+      +'<td style="padding:11px 10px;font-size:10px;color:var(--text3)">'+p.entered+'</td>'
+      +'<td style="padding:11px 10px"><button style="font-size:10px;padding:3px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:5px;color:var(--text3);cursor:pointer">View</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+// SETTINGS SECTION NAV
+function homeSettingsSec(sec, btn) {
+  document.querySelectorAll('.set-nav-item').forEach(function(b){
+    b.style.background = '';
+    b.style.color = 'var(--text3)';
+    b.classList.remove('active');
+  });
+  if (btn) { btn.style.background = 'var(--surface2)'; btn.style.color = 'var(--text)'; btn.classList.add('active'); }
+  ['set-channels','set-team','set-suppression','set-integrations','set-categories','set-ratelimits'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.style.display = 'none';
+  });
+  var target = document.getElementById('set-' + sec);
+  if (target) target.style.display = 'block';
+}
+
+// Init settings — show first section
+(function(){
+  setTimeout(function(){
+    ['set-team','set-suppression','set-integrations','set-categories','set-ratelimits'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.style.display='none';
+    });
+    var ch = document.getElementById('set-channels'); if(ch) ch.style.display='block';
+  }, 0);
+})();
+
+// Wrap homeJourneysView — make sure it exists
+(function(){
+  var main = document.getElementById('homeMain') || document.querySelector('#page-home .page');
+  if (!main) return;
+  var jv = document.getElementById('homeJourneysView');
+  if (!jv) {
+    // journeys content is the default home page content — it's always shown
+    // no action needed if homeJourneysView wraps everything
+  }
+})();
+
 // Auto-open setup if redirected from index "New Campaign" card
 if (sessionStorage.getItem('openSetup') === '1') {
   sessionStorage.removeItem('openSetup');
   setTimeout(openSetup, 100);
 }
 
+
+// CAMPAIGN ANALYTICS TAB SWITCHING (Phase 1)
+function canvasViewTab(tab, btn) {
+  document.querySelectorAll('#page-canvas .canvas-view-tab').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var overlay = document.getElementById('campaignAnalyticsOverlay');
+  var leftPanel = document.querySelector('#page-canvas .left-panel');
+  var canvasWrap = document.getElementById('canvasWrap');
+  var rightPanel = document.getElementById('rightPanel');
+  if (tab === 'analytics') {
+    if (overlay) { overlay.style.display = 'block'; }
+    if (leftPanel) leftPanel.style.visibility = 'hidden';
+    if (canvasWrap) canvasWrap.style.visibility = 'hidden';
+    if (rightPanel) rightPanel.style.display = 'none';
+    renderCampaignAnalytics();
+  } else {
+    if (overlay) overlay.style.display = 'none';
+    if (leftPanel) leftPanel.style.visibility = '';
+    if (canvasWrap) canvasWrap.style.visibility = '';
+    if (rightPanel) rightPanel.style.display = '';
+  }
+}
+
+// CAMPAIGN ANALYTICS TAB SWITCHING (Phase 2)
+function p2CanvasViewTab(tab, btn) {
+  document.querySelectorAll('#page-canvas2 .canvas-view-tab').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var overlay = document.getElementById('p2CampaignAnalyticsOverlay');
+  var mainPalette = document.getElementById('p2MainPalette');
+  var goalPalette = document.getElementById('p2GoalPalette');
+  var tabsRow = document.querySelector('.p2-tabs-row');
+  var p2Canvas = document.getElementById('p2CanvasWrap');
+  var goalCanvas = document.getElementById('p2GoalCanvas');
+  if (tab === 'analytics') {
+    if (overlay) { overlay.style.display = 'block'; }
+    [mainPalette, goalPalette, p2Canvas, goalCanvas].forEach(function(el){ if(el) el.style.visibility='hidden'; });
+    if (tabsRow) tabsRow.style.visibility = 'hidden';
+    renderP2CampaignAnalytics();
+  } else {
+    if (overlay) overlay.style.display = 'none';
+    [mainPalette, goalPalette, p2Canvas, goalCanvas].forEach(function(el){ if(el) el.style.visibility=''; });
+    if (tabsRow) tabsRow.style.visibility = '';
+  }
+}
+
+function renderBarSet(containerId, items) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = items.map(function(e) {
+    return '<div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>'+e.label+'</span><span style="font-weight:700;color:var(--text2)">'+e.pct+'%</span></div><div style="height:6px;background:var(--border2);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+e.pct+'%;background:'+e.color+';border-radius:3px"></div></div></div>';
+  }).join('');
+}
+
+function renderFunnel(containerId, steps) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = steps.map(function(s) {
+    return '<div style="margin-bottom:4px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>'+s.label+'</span><span style="color:var(--text2);font-weight:600">'+s.val.toLocaleString()+' <span style="color:'+s.color+';font-weight:700">'+s.pct+'%</span></span></div><div style="height:8px;background:var(--border2);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+s.pct+'%;background:'+s.color+';border-radius:4px"></div></div></div>';
+  }).join('');
+}
+
+function renderSparkline(containerId, vals, color) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  var max = Math.max.apply(null, vals);
+  el.innerHTML = vals.map(function(v,i){
+    var h = Math.max(6, Math.round((v/max)*76));
+    return '<div style="flex:1;background:'+(i===vals.length-1?color:color+'66')+';border-radius:2px 2px 0 0;height:'+h+'px;min-width:4px"></div>';
+  }).join('');
+}
+
+function renderCampaignAnalytics() {
+  renderSparkline('campSparkWrap', [12,18,22,15,28,34,29,38,44,31,27,35,42,39,51,47,44,38,55,62,58,49,67,71,65,58,72,78,74,69], '#4ade80');
+  renderFunnel('campFunnelWrap', [
+    {label:'Enrolled',val:3247,pct:100,color:'#4ade80'},
+    {label:'Received first action',val:3051,pct:94,color:'#38bdf8'},
+    {label:'Past day 3',val:2714,pct:84,color:'#818cf8'},
+    {label:'Reached mid-flow',val:2156,pct:66,color:'#a78bfa'},
+    {label:'Goal achieved',val:1247,pct:38,color:'#f59e0b'},
+    {label:'Completed flow',val:1758,pct:54,color:'#34d399'}
+  ]);
+  var tbody = document.getElementById('campNodeTable');
+  if (tbody) {
+    var nodes = [
+      {name:'Entry Trigger',type:'Entry',entered:3247,exited:196,conv:'94%'},
+      {name:'Wait 3 Days',type:'Wait',entered:3051,exited:337,conv:'89%'},
+      {name:'Add Bonus',type:'Activity',entered:2714,exited:0,conv:'100%'},
+      {name:'Email — Day 5',type:'Comms',entered:2714,exited:558,conv:'79%'},
+      {name:'VIP Split',type:'Condition',entered:2156,exited:44,conv:'98%'},
+      {name:'Leaderboard',type:'Activity',entered:1890,exited:0,conv:'100%'},
+      {name:'SMS Re-engage',type:'Comms',entered:266,exited:31,conv:'88%'},
+    ];
+    tbody.innerHTML = nodes.map(function(n,i){
+      return '<tr style="border-top:'+(i>0?'1px solid var(--border)':'none')+'"><td style="padding:8px 0;color:var(--text2)">'+n.name+'</td><td style="padding:8px 6px;color:var(--text3);font-size:10px">'+n.type+'</td><td style="padding:8px 6px;text-align:right;font-weight:600">'+n.entered.toLocaleString()+'</td><td style="padding:8px 6px;text-align:right;color:#f87171">'+n.exited+'</td><td style="padding:8px 0;text-align:right"><span style="color:#4ade80;font-weight:700">'+n.conv+'</span></td></tr>';
+    }).join('');
+  }
+  var chRows = document.getElementById('campChannelRows');
+  if (chRows) {
+    var channels = [
+      {icon:'Email',sent:8142,opens:'41%',clicks:'12%',color:'#38bdf8'},
+      {icon:'SMS',sent:2714,opens:'78%',clicks:'31%',color:'#4ade80'},
+      {icon:'Push',sent:1890,opens:'22%',clicks:'8%',color:'#f59e0b'},
+    ];
+    chRows.innerHTML = channels.map(function(ch){
+      return '<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:12px;font-weight:700;color:var(--text2)">'+ch.icon+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+ch.sent.toLocaleString()+' sent</span></div><div style="display:flex;gap:20px"><div><div style="font-size:9px;color:var(--text3);margin-bottom:2px">Open Rate</div><div style="font-size:18px;font-weight:700;color:'+ch.color+'">'+ch.opens+'</div></div><div><div style="font-size:9px;color:var(--text3);margin-bottom:2px">Click Rate</div><div style="font-size:18px;font-weight:700;color:var(--text2)">'+ch.clicks+'</div></div></div></div>';
+    }).join('');
+  }
+  renderBarSet('campExitBars', [
+    {label:'Goal achieved (early exit)',pct:68,color:'#a78bfa'},
+    {label:'Flow completed naturally',pct:19,color:'#38bdf8'},
+    {label:'Player opted out',pct:5,color:'#f87171'},
+    {label:'Suppression rule',pct:4,color:'#f59e0b'},
+    {label:'Timeout / inactivity',pct:4,color:'#6b7280'},
+  ]);
+  renderSparkline('campGoalSpark', [3,5,8,6,11,14,12,18,22,16,20,27,24,31,29,35,38,33,42,47,44,39,51,55,50,48,58,62,59,68], '#a78bfa');
+}
+
+function renderP2CampaignAnalytics() {
+  renderSparkline('p2campSparkWrap', [8,14,19,12,25,31,26,35,41,28,24,32,39,36,48,44,41,35,52,59,55,46,64,68,62,55,69,75,71,66], '#a78bfa');
+  renderFunnel('p2campFunnelWrap', [
+    {label:'Enrolled',val:2841,pct:100,color:'#4ade80'},
+    {label:'Received first action',val:2698,pct:95,color:'#38bdf8'},
+    {label:'Goal milestone 1 hit',val:1987,pct:70,color:'#a78bfa'},
+    {label:'Goal milestone 2 hit',val:1421,pct:50,color:'#8b5cf6'},
+    {label:'Goal fully achieved',val:1024,pct:36,color:'#f59e0b'},
+    {label:'Flow completed',val:1563,pct:55,color:'#34d399'}
+  ]);
+  var milestones = document.getElementById('p2campMilestones');
+  if (milestones) {
+    var ms = [
+      {label:'Milestone 1 — Deposit >= $50',pct:70,players:1987,color:'#a78bfa'},
+      {label:'Milestone 2 — Play 3 games',pct:50,players:1421,color:'#8b5cf6'},
+      {label:'Milestone 3 — Reach Level 5',pct:36,players:1024,color:'#6d28d9'},
+    ];
+    milestones.innerHTML = ms.map(function(m){
+      return '<div style="padding:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:11px;font-weight:600;color:var(--text2)">'+m.label+'</span><span style="font-size:10px;color:var(--text3)">'+m.players.toLocaleString()+' players</span></div><div style="height:10px;background:var(--border2);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+m.pct+'%;background:'+m.color+';border-radius:5px"></div></div><div style="margin-top:5px;font-size:10px;font-weight:700;color:'+m.color+'">'+m.pct+'% achieved</div></div>';
+    }).join('');
+  }
+  renderBarSet('p2campExitBars', [
+    {label:'Goal achieved (early exit)',pct:61,color:'#a78bfa'},
+    {label:'Flow completed naturally',pct:22,color:'#38bdf8'},
+    {label:'Player opted out',pct:7,color:'#f87171'},
+    {label:'Suppression rule',pct:5,color:'#f59e0b'},
+    {label:'Timeout / inactivity',pct:5,color:'#6b7280'},
+  ]);
+}
 </script>
 
 <!-- ══ CANVAS JS ══ -->
@@ -5246,10 +6012,10 @@ window.onload = () => {
   </div>
   <div class="vsep"></div>
   <nav class="nav-links">
-    <button class="nav-link active">Journeys</button>
-    <button class="nav-link">Analytics</button>
-    <button class="nav-link">Players</button>
-    <button class="nav-link">Settings</button>
+    <button class="nav-link active" onclick="home2Tab('journeys',this)">Journeys</button>
+    <button class="nav-link"        onclick="home2Tab('analytics',this)">Analytics</button>
+    <button class="nav-link"        onclick="home2Tab('players',this)">Players</button>
+    <button class="nav-link"        onclick="home2Tab('settings',this)">Settings</button>
   </nav>
   <div class="topbar-right">
     <button class="btn btn-ghost" onclick="p2OpenTemplates()">📋 From Template</button>
@@ -5816,6 +6582,10 @@ function p2InitIfNeeded() {
     <div class="vsep"></div>
     <input class="campaign-name" id="p2CampaignName" value="Tournament Re-engagement Q3"/>
     <div class="topbar-status"><div class="status-dot"></div><span style="font-size:10px;color:var(--text3)">Draft</span></div>
+    <div style="margin-left:10px;display:flex;gap:2px">
+      <button class="canvas-view-tab active" id="p2cvt-builder" onclick="p2CanvasViewTab('builder',this)">&#9889; Journey</button>
+      <button class="canvas-view-tab" id="p2cvt-analytics" onclick="p2CanvasViewTab('analytics',this)">&#128202; Analytics</button>
+    </div>
     <div class="topbar-actions">
       <button class="icon-btn">↩</button>
       <button class="icon-btn">↪</button>
@@ -6033,6 +6803,90 @@ function p2InitIfNeeded() {
   </div>
 </div>
 
+
+<!-- CAMPAIGN ANALYTICS OVERLAY Phase 2 -->
+<div id="p2CampaignAnalyticsOverlay" style="display:none;position:absolute;inset:0;z-index:90;background:var(--bg);overflow-y:auto;padding:0 24px 40px">
+<div class="page">
+  <div class="page-header" style="margin-bottom:20px">
+    <div class="page-header-left">
+      <div class="page-eyebrow">Campaign Analytics</div>
+      <div class="page-title">Tournament Re-engagement Q3</div>
+      <div class="page-sub">Goal-aware analytics — milestone progress, early exits, flow vs goal completion</div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <div style="font-size:11px;font-weight:700;color:#a78bfa;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);padding:4px 12px;border-radius:6px">Phase 2 · Goal Campaign</div>
+      <button class="btn btn-ghost" style="font-size:11px">Export</button>
+    </div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px">
+    <div class="stat-card" style="border-left:3px solid #4ade80">
+      <div class="stat-label">Players Enrolled</div>
+      <div class="stat-value" style="font-size:22px">2,841</div>
+      <div class="stat-sub">98 today</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #a78bfa">
+      <div class="stat-label">Goal Fully Achieved</div>
+      <div class="stat-value" style="font-size:22px">36.1%</div>
+      <div class="stat-sub" style="color:#a78bfa">1,024 players</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #8b5cf6">
+      <div class="stat-label">Milestone 1 Hit</div>
+      <div class="stat-value" style="font-size:22px">70%</div>
+      <div class="stat-sub">1,987 players</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #38bdf8">
+      <div class="stat-label">Flow Completed</div>
+      <div class="stat-value" style="font-size:22px">55.1%</div>
+      <div class="stat-sub">Without full goal</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #fbbf24">
+      <div class="stat-label">Avg Time to Goal</div>
+      <div class="stat-value" style="font-size:22px">3.1d</div>
+      <div class="stat-sub">Median 2.0d</div>
+    </div>
+    <div class="stat-card" style="border-left:3px solid #f97316">
+      <div class="stat-label">Currently Active</div>
+      <div class="stat-value" style="font-size:22px">254</div>
+      <div class="stat-sub">In journey now</div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Entries sparkline + Funnel -->
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:14px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;display:flex;justify-content:space-between">
+        <span>Player Entries - Daily</span><span style="font-size:10px;font-weight:400;color:var(--text3)">Last 30 days</span>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:3px;height:80px" id="p2campSparkWrap"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:9px;color:var(--text3)">
+        <span>30d ago</span><span>15d ago</span><span>Today</span>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px">Journey Funnel</div>
+      <div id="p2campFunnelWrap" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Goal milestone progress + Exit reasons -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px">Goal Milestone Progress</div>
+      <div id="p2campMilestones"></div>
+      <div style="margin-top:12px;padding:10px 14px;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.15);border-radius:8px;font-size:10px;color:var(--text3)">
+        Players who exit early (goal achieved before flow end) count toward Goal Achieved, not Flow Completed.
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:14px">Exit Reasons</div>
+      <div id="p2campExitBars" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+
+</div>
+</div>
 </div><!-- /page-canvas2 -->
 
 <script>
